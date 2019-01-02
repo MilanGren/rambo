@@ -48,6 +48,7 @@ public class Rambo extends AdvancedRobot {
             // }
             
             doMove(); 
+            execute() ;
             log("") ;
             log("####################") ;
             log("") ;
@@ -55,13 +56,10 @@ public class Rambo extends AdvancedRobot {
     }
     
     private void doMove() {
-        setMaxVelocity(3) ;
-        //if (!this.tankFoundFirstTime) {
-            findEnemyTankFirstTime();
-        //}
-        execute() ;
-        //this.tankFoundFirstTime = false ;
-
+        setMaxVelocity(6) ;
+        log("searching for enemy tank...") ;
+        setAhead(1000*moveDirection) ;
+        setTurnRadarRight(360) ;
     }
     
     double normalizeBearing(double angle) {
@@ -72,20 +70,6 @@ public class Rambo extends AdvancedRobot {
     
     public <T> void log(T t) {
         System.out.println(t) ;
-    }
-    
-    private void findEnemyTankFirstTime() {
-        log("searching for enemy tank...") ;
-        setAhead(1000*moveDirection) ;
-        //setMaxVelocity(0) ;
-        int i = 360 ;
-        if (!this.tankFoundFirstTime) {
-            if (this.moveGRtogether)
-                turnGunRight(i) ;
-            else
-                turnRadarRight(i) ;
-        }
-        
     }
     
     public void onScannedRobot(ScannedRobotEvent e) {
@@ -101,12 +85,20 @@ public class Rambo extends AdvancedRobot {
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
                        
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
+
+        
         
         log("  additional targetting") ;
         double firepower = 1 ;
-        enemy.setT1(getTime(),20 - 3*firepower) ;
-        //turnGunRight(normalizeBearing(enemy.getAdditionalAngle())) ;
-        
+        enemy.finalize(getTime(),20 - 3*firepower) ;
+                
+        //setGun is happening when moving tank body
+        //gun starts to move respecting predictions of enemy. It does not respect moving of self body => the smaller e.getBearing is, the better. 
+        // ... This happens after the very first targeting is done. For the very first targeting the gun is overheated, so it does not fire, so
+        // ... i don't need to solve that.
+    
+        setBodyPerpendicularlyToBullet(e.getBearing()) ;
+        // until setGun is done, radar moving is down
         if (!this.moveGRtogether) 
             setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
         else
@@ -118,17 +110,7 @@ public class Rambo extends AdvancedRobot {
         } else {
             log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
-        
-        setBodyPerpendicularlyToBullet(e.getBearing()) ;
-        
-        //log("this.tankFoundFirstTime " + this.tankFoundFirstTime) ;
-        //this.tankFoundFirstTime = true ;
-        
-        
-        
-        //log("dx " + dx + "  x " + x) ;
-        //log("dy " + dy + "  y " + y) ;
-        //log("his heading " + e.getHeading()) ;    
+
     }
 
 	/**
@@ -186,8 +168,8 @@ public class Rambo extends AdvancedRobot {
             }
         }
         
-        if (Math.abs(angle) < 0) {
-            log("  angle < 20 so not doing anything") ;
+        if (Math.abs(angle) < 15) {
+            log("  angle < " + angle + " so not doing anything") ;
         } 
         else {
             //turnLeft(angle) ;

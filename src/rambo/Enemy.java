@@ -59,7 +59,7 @@ public class Enemy {
         return timeForBullet ;
     }
     
-    void setT1(double t1,double bulletVelocity) {
+    void finalize(double t1,double bulletVelocity) {
         double additionalTime = (t1 - this.t0) ;
         double dt = additionalTime + timeForBullet(bulletVelocity) ;
         double ds = dt*this.velocity ;
