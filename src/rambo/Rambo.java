@@ -5,7 +5,6 @@
  */
 package rambo;
 
-
 import robocode.*;
 import java.awt.Color;
 
@@ -24,6 +23,8 @@ public class Rambo extends AdvancedRobot {
     boolean moveGRtogether = false ;
     
     int moveDirection = 1 ;
+    
+    Enemy enemy = new Enemy() ;
     
     public void run() {
 		// Initialization of the robot should be put here
@@ -47,7 +48,9 @@ public class Rambo extends AdvancedRobot {
             // }
             
             doMove(); 
-
+            log("") ;
+            log("####################") ;
+            log("") ;
         }
     }
     
@@ -74,6 +77,7 @@ public class Rambo extends AdvancedRobot {
     private void findEnemyTankFirstTime() {
         log("searching for enemy tank...") ;
         setAhead(1000*moveDirection) ;
+        //setMaxVelocity(0) ;
         int i = 360 ;
         if (!this.tankFoundFirstTime) {
             if (this.moveGRtogether)
@@ -85,17 +89,32 @@ public class Rambo extends AdvancedRobot {
     }
     
     public void onScannedRobot(ScannedRobotEvent e) {
-
+        double distance = e.getDistance() ;
+        double angle = e.getBearingRadians() ;
+        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
+        double dx = distance*Math.sin(absAngle) ;
+        double dy = distance*Math.cos(absAngle) ;
+        double x = getX() + dx ;
+        double y = getY() + dy ;
+        
+        
+        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
+                       
+        enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
+        
+        log("  additional targetting") ;
+        double firepower = 1 ;
+        enemy.setT1(getTime(),20 - 3*firepower) ;
+        turnGunRight(normalizeBearing(enemy.getAdditionalAngle())) ;
+        
         if (!this.moveGRtogether) 
-            setGun(e.getBearing()) ;
+            setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
         else
-            setGun(e.getBearing()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
+            setGun(e.getBearing() + enemy.getAdditionalAngle()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
 
-        
-        
         if (getGunHeat() <= 0) {
             log("fire!") ;
-            fire(1) ;
+            fire(firepower) ;
         } else {
             log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
@@ -106,16 +125,7 @@ public class Rambo extends AdvancedRobot {
         //this.tankFoundFirstTime = true ;
         
         
-        double distance = e.getDistance() ;
-        double angle = e.getBearingRadians() ;
-        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
-        double dx = distance*Math.sin(absAngle) ;
-        double dy = distance*Math.cos(absAngle) ;
-        double x = getX() + dx ;
-        double y = getY() + dy ;
         
-        
-        log("relative angle " + e.getBearing() + ", absolute angle " + (getHeading() + e.getBearing())) ;
         //log("dx " + dx + "  x " + x) ;
         //log("dy " + dy + "  y " + y) ;
         //log("his heading " + e.getHeading()) ;    
@@ -135,7 +145,7 @@ public class Rambo extends AdvancedRobot {
     
     private void setGun(double angle) {
         log("targetting") ;
-        log("  gunToBody " + gunToBody() + " bullet from " + angle) ;
+        //log("  gunToBody " + gunToBody() + " bullet from " + angle) ;
         double moveGunBy = angle - gunToBody() ;
         log("  moveGunBy " + moveGunBy) ;
         turnGunRight(normalizeBearing(moveGunBy)) ;
