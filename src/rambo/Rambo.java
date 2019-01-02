@@ -98,7 +98,7 @@ public class Rambo extends AdvancedRobot {
         // ... i don't need to solve that.
     
         setBodyPerpendicularlyToBullet(e.getBearing()) ;
-        // until setGun is done, radar moving is down
+        // until setGun is done, radar moving is off
         if (!this.moveGRtogether) 
             setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
         else
