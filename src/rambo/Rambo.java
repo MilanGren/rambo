@@ -105,7 +105,7 @@ public class Rambo extends AdvancedRobot {
         log("  additional targetting") ;
         double firepower = 1 ;
         enemy.setT1(getTime(),20 - 3*firepower) ;
-        turnGunRight(normalizeBearing(enemy.getAdditionalAngle())) ;
+        //turnGunRight(normalizeBearing(enemy.getAdditionalAngle())) ;
         
         if (!this.moveGRtogether) 
             setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
