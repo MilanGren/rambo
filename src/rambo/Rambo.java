@@ -46,20 +46,19 @@ public class Rambo extends AdvancedRobot {
             //    stop = true ;
             // }
             
-            mainSequence(); 
+            doMove(); 
 
         }
     }
     
-    private void mainSequence() {
-        if (!this.tankFoundFirstTime) {
+    private void doMove() {
+        setMaxVelocity(3) ;
+        //if (!this.tankFoundFirstTime) {
             findEnemyTankFirstTime();
-        }
-        this.tankFoundFirstTime = false ;
-            
-        log("A") ;
-        ahead(40*moveDirection) ;
-        log("B") ;
+        //}
+        execute() ;
+        //this.tankFoundFirstTime = false ;
+
     }
     
     double normalizeBearing(double angle) {
@@ -74,52 +73,37 @@ public class Rambo extends AdvancedRobot {
     
     private void findEnemyTankFirstTime() {
         log("searching for enemy tank...") ;
+        setAhead(1000*moveDirection) ;
         int i = 360 ;
-        while (!this.tankFoundFirstTime) {
+        if (!this.tankFoundFirstTime) {
             if (this.moveGRtogether)
                 turnGunRight(i) ;
             else
                 turnRadarRight(i) ;
-            
-            //execute() ;
-            i += 1 ;
-        } 
+        }
+        
     }
     
     public void onScannedRobot(ScannedRobotEvent e) {
-        
-        if (!this.tankFoundFirstTime && getGunHeat() <= 0) {
-            log("found enemy tank " + e.getName()) ;
-            log("------") ;
-            log("gun heading " + getGunHeading()) ;
-            log("radar heading " + getRadarHeading()) ;
-            doNothing() ;
-            //setGun(e.getBearing()) ;
-            log("gun heading " + getGunHeading()) ;
-            log("radar heading " + getRadarHeading()) ;
-            doNothing() ;
 
-            log("gun heading " + getGunHeading()) ;
-            log("radar heading " + getRadarHeading()) ;
-            log("------") ;
-            
-            if (!this.moveGRtogether) 
-                setGun(e.getBearing()) ;
-            else
-                setGun(e.getBearing()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
-            
-          
-            setBodyPerpendicularlyToBullet(e.getBearing());
-            fire(1) ;
+        if (!this.moveGRtogether) 
+            setGun(e.getBearing()) ;
+        else
+            setGun(e.getBearing()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
+
+        
+        
+        if (getGunHeat() <= 0) {
             log("fire!") ;
-        }
-        else {
-            //log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
+            fire(1) ;
+        } else {
+            log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
         
+        setBodyPerpendicularlyToBullet(e.getBearing()) ;
         
         //log("this.tankFoundFirstTime " + this.tankFoundFirstTime) ;
-        this.tankFoundFirstTime = true ;
+        //this.tankFoundFirstTime = true ;
         
         
         double distance = e.getDistance() ;
@@ -131,7 +115,7 @@ public class Rambo extends AdvancedRobot {
         double y = getY() + dy ;
         
         
-        //log("relative angle " + e.getBearing() + ", absolute angle " + (getHeading() + e.getBearing())) ;
+        log("relative angle " + e.getBearing() + ", absolute angle " + (getHeading() + e.getBearing())) ;
         //log("dx " + dx + "  x " + x) ;
         //log("dy " + dy + "  y " + y) ;
         //log("his heading " + e.getHeading()) ;    
@@ -146,19 +130,18 @@ public class Rambo extends AdvancedRobot {
     
     private double gunToBody() {
         double angle = getGunHeading() - getHeading() ;
-        if (angle < -180) {
-            angle = 360 + angle ;
-        }
-        return angle ;
+        return normalizeBearing(angle) ;
     }
     
     private void setGun(double angle) {
-        log("gunToBody " + gunToBody() + " bullet from " + angle) ;
-        double moveGunBy = angle -gunToBody() ;
-        log("moveGunBy " + moveGunBy) ;
+        log("targetting") ;
+        log("  gunToBody " + gunToBody() + " bullet from " + angle) ;
+        double moveGunBy = angle - gunToBody() ;
+        log("  moveGunBy " + moveGunBy) ;
         turnGunRight(normalizeBearing(moveGunBy)) ;
+        //setTurnGunRight(normalizeBearing(moveGunBy)) ;
         //execute() ;
-        //turnGunRight( Math.abs(angle - 360.0) < epsilon ? 0 : angle ) ;
+        
     }
     
     //TODO: nemelo by fungovat uplne vzdy, staci mimo ramec +-20 stupnu       
@@ -193,14 +176,13 @@ public class Rambo extends AdvancedRobot {
             }
         }
         
-        if (Math.abs(angle) < 20) {
+        if (Math.abs(angle) < 0) {
             log("  angle < 20 so not doing anything") ;
         } 
         else {
-            turnLeft(angle) ;
+            //turnLeft(angle) ;
+            setTurnLeft(angle) ;
         }
-            
-        //execute();
                
     }
             
