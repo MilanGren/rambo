@@ -7,6 +7,8 @@ package rambo;
 
 import robocode.*;
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 // API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
@@ -23,6 +25,8 @@ public class Rambo extends AdvancedRobot {
     boolean moveGRtogether = false ;
     
     int moveDirection = 1 ;
+    
+    Map<Double, Double> map = new HashMap<>() ;
     
     Enemy enemy = new Enemy() ;
     
@@ -56,7 +60,7 @@ public class Rambo extends AdvancedRobot {
     }
     
     private void doMove() {
-        setMaxVelocity(6) ;
+        setMaxVelocity(0) ;
         log("searching for enemy tank...") ;
         setAhead(1000*moveDirection) ;
         setTurnRadarRight(360) ;
@@ -83,7 +87,10 @@ public class Rambo extends AdvancedRobot {
         
         
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
-                       
+        
+        
+        
+                
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
 
         
@@ -98,12 +105,18 @@ public class Rambo extends AdvancedRobot {
         // ... i don't need to solve that.
     
         setBodyPerpendicularlyToBullet(e.getBearing()) ;
+
+        double errT1 = getTime() ;
         // until setGun is done, radar moving is off
         if (!this.moveGRtogether) 
             setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
         else
             setGun(e.getBearing() + enemy.getAdditionalAngle()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
-
+        
+        double errDt = getTime() - errT1 ;
+        log("               error due to move before fire and after setting angles " + errDt) ;
+        
+                
         if (getGunHeat() <= 0) {
             log("fire!") ;
             fire(firepower) ;
