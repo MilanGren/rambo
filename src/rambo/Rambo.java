@@ -94,10 +94,9 @@ public class Rambo extends AdvancedRobot {
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
 
         
-        
         log("  additional targetting") ;
         double firepower = 1 ;
-        enemy.finalize(getTime(),20 - 3*firepower) ;
+        enemy.fin(20 - 3*firepower) ;
                 
         //setGun is happening when moving tank body
         //gun starts to move respecting predictions of enemy. It does not respect moving of self body => the smaller e.getBearing is, the better. 
@@ -105,7 +104,7 @@ public class Rambo extends AdvancedRobot {
         // ... i don't need to solve that.
     
         setBodyPerpendicularlyToBullet(e.getBearing()) ;
-
+        log( "!!!!!!!!!!!!!!!! +   " + enemy.getAdditionalAngle() ) ;
         double errT1 = getTime() ;
         // until setGun is done, radar moving is off
         if (!this.moveGRtogether) 
