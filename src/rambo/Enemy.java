@@ -69,9 +69,7 @@ public class Enemy {
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
-        solver.solve() ;
-        
-        
+        solver.solve() ; 
         this.additionalAngle = solver.additionalAngle ;
     }
     

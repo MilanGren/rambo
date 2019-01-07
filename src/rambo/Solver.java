@@ -59,8 +59,8 @@ public class Solver {
         log("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
         dA = Math.cos(toRad(alpha))*ds ;
         dB = Math.sin(toRad(alpha))*ds ;
-        log("  => enemy dA " + dA) ;
-        log("  => enemy dB " + dB) ;
+        log("  => dA " + dA) ;
+        log("  => dB " + dB) ;
         double projection = this.distanceOriginal + dA ;
         this.additionalAngle = toDeg(-Math.atan(dB/projection)) ;
         double xx = toDeg(-Math.atan(dB/projection)) ;

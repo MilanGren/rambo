@@ -26,13 +26,31 @@ public class Rambo extends AdvancedRobot {
     
     int moveDirection = 1 ;
     
+    private double wallMargin = 50 ;
+    private int tooCloseToWall = 0;
+    
     Map<Double, Double> map = new HashMap<>() ;
     
     Enemy enemy = new Enemy() ;
     
     public void run() {
 		// Initialization of the robot should be put here
-
+        
+        addCustomEvent(new Condition("too_close_to_walls") {
+            public boolean test() {
+		return (
+                    // we're too close to the left wall
+                    (getX() <= wallMargin ||
+                    // or we're too close to the right wall
+                    getX() >= getBattleFieldWidth() - wallMargin ||
+                    // or we're too close to the bottom wall
+                    getY() <= wallMargin ||
+                    // or we're too close to the top wall
+                    getY() >= getBattleFieldHeight() - wallMargin)
+		);
+            }
+	}) ;
+        
         setColors(Color.blue,Color.yellow,Color.white); // body,gun,radar
 
         if (!moveGRtogether)
@@ -59,11 +77,32 @@ public class Rambo extends AdvancedRobot {
         }
     }
     
+    public void onCustomEvent(CustomEvent e) {
+	if (e.getCondition().getName().equals("too_close_to_walls")) {
+            if (tooCloseToWall <= 0) {
+                log("too_close_to_walls") ;
+		tooCloseToWall += wallMargin;
+		setMaxVelocity(0); 
+            }
+	}
+    }
+    
     private void doMove() {
-        setMaxVelocity(0) ;
+        //setMaxVelocity(8) ;
         log("searching for enemy tank...") ;
         setAhead(1000*moveDirection) ;
         setTurnRadarRight(360) ;
+
+	if (tooCloseToWall > 0) {
+            tooCloseToWall -= 3 ;
+            log("wall " + tooCloseToWall) ;
+        }
+        
+	if (getVelocity() == 0) {
+            moveDirection *= -1;
+            setMaxVelocity(Rules.MAX_VELOCITY) ;
+	}
+        
     }
     
     double normalizeBearing(double angle) {
@@ -87,10 +126,7 @@ public class Rambo extends AdvancedRobot {
         
         
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
-        
-        
-        
-                
+  
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
 
         
