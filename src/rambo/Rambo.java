@@ -22,7 +22,7 @@ public class Rambo extends AdvancedRobot {
     
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
-    boolean moveGRtogether = false ;
+    boolean moveGRtogether, reached100 = false ;
     
     int moveDirection = 1 ;
     
@@ -103,6 +103,7 @@ public class Rambo extends AdvancedRobot {
             setMaxVelocity(Rules.MAX_VELOCITY) ;
 	}
         
+        
     }
     
     double normalizeBearing(double angle) {
@@ -115,21 +116,13 @@ public class Rambo extends AdvancedRobot {
         System.out.println(t) ;
     }
     
-    public void onScannedRobot(ScannedRobotEvent e) {
+    
+    public void setWhenClose(ScannedRobotEvent e) {
+        
         double distance = e.getDistance() ;
-        double angle = e.getBearingRadians() ;
-        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
-        double dx = distance*Math.sin(absAngle) ;
-        double dy = distance*Math.cos(absAngle) ;
-        double x = getX() + dx ;
-        double y = getY() + dy ;
-        
-        
-        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
   
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
 
-        
         log("  additional targetting") ;
         double firepower = 1 ;
         enemy.fin(20 - 3*firepower) ;
@@ -151,13 +144,49 @@ public class Rambo extends AdvancedRobot {
         double errDt = getTime() - errT1 ;
         log("               error due to move before fire and after setting angles " + errDt) ;
         
-                
+
         if (getGunHeat() <= 0) {
             log("fire!") ;
             fire(firepower) ;
         } else {
             log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
+    }
+    
+    public void onScannedRobot(ScannedRobotEvent e) {
+        double distance = e.getDistance() ;
+        double angle = e.getBearingRadians() ;
+        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
+        double dx = distance*Math.sin(absAngle) ;
+        double dy = distance*Math.cos(absAngle) ;
+        double x = getX() + dx ;
+        double y = getY() + dy ;
+
+
+        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
+        log("distance " + distance + " reached1000" + reached100) ;
+        if (distance < 200 && !reached100) {
+            log("reached 100") ;
+            setWhenClose(e) ;
+            reached100 = true ;
+           // skipThis = true ;
+        }
+        
+        else if (distance < 300 && reached100) {
+            log("withing distance 200") ;
+            setWhenClose(e) ;
+        }
+        
+        else {
+            reached100 = false ;
+            setTurnLeft(e.getBearing()) ;
+            log("is too far") ;
+            
+        }
+            
+        
+        
+        
 
     }
 
