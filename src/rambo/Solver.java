@@ -29,7 +29,7 @@ public class Solver {
     }
     
     protected <T> void log(T t) {
-        System.out.println(t) ;
+        //System.out.println(t) ;
     }
     
     protected double toRad(double x) {

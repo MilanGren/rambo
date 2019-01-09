@@ -20,13 +20,19 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
+    private static final double WALLMARGIN = 150 ;
+    private double tooCloseToWallDescrement = 3 ;
+    
+    String fromWhichSide = "" ;
+    double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
+            
+            
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
-    boolean moveGRtogether, reached100 = false ;
+    boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false ;
     
     int moveDirection = 1 ;
     
-    private double wallMargin = 50 ;
     private int tooCloseToWall = 0;
     
     Map<Double, Double> map = new HashMap<>() ;
@@ -38,18 +44,36 @@ public class Rambo extends AdvancedRobot {
         
         addCustomEvent(new Condition("too_close_to_walls") {
             public boolean test() {
+                boolean bol ;
+                if (getX() <= WALLMARGIN) {
+                    fromWhichSide = "left" ;
+                    wallSurfaceAngle = 90 ;
+                } else if (getX() >= getBattleFieldWidth() - WALLMARGIN) {
+                    bol = true ;
+                    fromWhichSide = "right" ;
+                    wallSurfaceAngle = -90 ;
+                } else if (getY() <= WALLMARGIN) {
+                    wallSurfaceAngle = 0 ;
+                    fromWhichSide = "bottom" ;
+                } else if (getY() >= getBattleFieldHeight() - WALLMARGIN) {
+                    wallSurfaceAngle = 180 ;
+                    fromWhichSide = "top" ;
+                }
+
 		return (
                     // we're too close to the left wall
-                    (getX() <= wallMargin ||
+                    (getX() <= WALLMARGIN ||
                     // or we're too close to the right wall
-                    getX() >= getBattleFieldWidth() - wallMargin ||
+                    getX() >= getBattleFieldWidth() - WALLMARGIN ||
                     // or we're too close to the bottom wall
-                    getY() <= wallMargin ||
+                    getY() <= WALLMARGIN ||
                     // or we're too close to the top wall
-                    getY() >= getBattleFieldHeight() - wallMargin)
+                    getY() >= getBattleFieldHeight() - WALLMARGIN)
 		);
             }
 	}) ;
+        
+        
         
         setColors(Color.blue,Color.yellow,Color.white); // body,gun,radar
 
@@ -79,9 +103,10 @@ public class Rambo extends AdvancedRobot {
     
     public void onCustomEvent(CustomEvent e) {
 	if (e.getCondition().getName().equals("too_close_to_walls")) {
+            //og("x " + getX() + "   y " + getY()) ;
             if (tooCloseToWall <= 0) {
-                log("too_close_to_walls") ;
-		tooCloseToWall += wallMargin;
+                log("too_close_to_walls " + fromWhichSide) ;
+		tooCloseToWall += WALLMARGIN;
 		setMaxVelocity(0); 
             }
 	}
@@ -89,13 +114,20 @@ public class Rambo extends AdvancedRobot {
     
     private void doMove() {
         //setMaxVelocity(8) ;
-        log("searching for enemy tank...") ;
+        //log("searching for enemy tank...") ;
         setAhead(1000*moveDirection) ;
         setTurnRadarRight(360) ;
 
 	if (tooCloseToWall > 0) {
-            tooCloseToWall -= 3 ;
-            log("wall " + tooCloseToWall) ;
+            holdSettingBodyToBullet = true ;
+            tooCloseToWall -= tooCloseToWallDescrement ;
+            log("doMove: wall " + tooCloseToWall) ;
+            log("doMove: holdSettingToBullet " + holdSettingBodyToBullet) ;
+            
+            //TODO setBodyPerpendicularToWall setBodyPerpendicularlyToBullet(NEJAKYUHEL )
+        } else {
+            log("doMove: not within wall boundary") ;
+            holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
         }
         
 	if (getVelocity() == 0) {
@@ -132,7 +164,7 @@ public class Rambo extends AdvancedRobot {
         // ... This happens after the very first targeting is done. For the very first targeting the gun is overheated, so it does not fire, so
         // ... i don't need to solve that.
     
-        setBodyPerpendicularlyToBullet(e.getBearing()) ;
+        //setBodyPerpendicularlyToBullet(e.getBearing()) ;
         log( "!!!!!!!!!!!!!!!! +   " + enemy.getAdditionalAngle() ) ;
         double errT1 = getTime() ;
         // until setGun is done, radar moving is off
@@ -162,23 +194,26 @@ public class Rambo extends AdvancedRobot {
         double x = getX() + dx ;
         double y = getY() + dy ;
 
-
+double firstRingRadius = 150 ;
+double secondRingRadius = 400 ;
+        
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
-        log("distance " + distance + " reached1000" + reached100) ;
-        if (distance < 200 && !reached100) {
-            log("reached 100") ;
+        
+        if (distance < firstRingRadius && !firstRingReached) {
+            log("reached " + firstRingRadius) ;
+            setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
-            reached100 = true ;
-           // skipThis = true ;
+            firstRingReached = true ;
         }
         
-        else if (distance < 300 && reached100) {
-            log("withing distance 200") ;
+        else if (distance < secondRingRadius && firstRingReached) {
+            log("withing distance " + secondRingRadius) ;
+            setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
         }
         
         else {
-            reached100 = false ;
+            firstRingReached = false ;
             setTurnLeft(e.getBearing()) ;
             log("is too far") ;
             
@@ -214,43 +249,49 @@ public class Rambo extends AdvancedRobot {
     }
     
     //TODO: nemelo by fungovat uplne vzdy, staci mimo ramec +-20 stupnu       
-    private void setBodyPerpendicularlyToBullet(double b) {        
-        double angle ;
+    private void setBodyPerpendicularlyToBullet(double b) {
+//log("setBodyPerpendicularlyToBullet hold  = " + holdSettingToBullet) ;        
+        if (holdSettingBodyToBullet == false) {
         
-        log("move body by") ;
+            double angle ;
         
-        if (b <= 0) {
-            if ( b >= -90) {
-                angle = 90 + b ;
-                log("  1 right " + angle) ;
-                //turnRight(angle) ;
-                angle = -angle ; ///then I can turnLeft(angle)
-            } else {
-                //angle = 90 - (180 + b) ;
-                angle = -b - 90 ;
-                log("  2 left " + angle) ;
-                //turnLeft(angle) ;
-            }            
-        }
-        else {            
-            if ( b <= 90) {
-                angle = (90 - b) ;
-                log("  3 left " + angle) ;
-                //turnLeft(angle) ;
-            } else {
-                angle = (b - 90) ;
-                log("  4 right " + angle ) ;
-                //turnRight(angle) ;
-                angle = -angle ; //then I can turnLeft(angle)
+            log("move body by") ;
+        
+            if (b <= 0) {
+                if ( b >= -90) {
+                    angle = 90 + b ;
+                    log("  1 right " + angle) ;
+                    //turnRight(angle) ;
+                    angle = -angle ; ///then I can turnLeft(angle)
+                } else {
+                    //angle = 90 - (180 + b) ;
+                    angle = -b - 90 ;
+                    log("  2 left " + angle) ;
+                    //turnLeft(angle) ;
+                }            
             }
-        }
-        
-        if (Math.abs(angle) < 15) {
-            log("  angle < " + angle + " so not doing anything") ;
-        } 
-        else {
-            //turnLeft(angle) ;
-            setTurnLeft(angle) ;
+            else {            
+                if ( b <= 90) {
+                    angle = (90 - b) ;
+                    log("  3 left " + angle) ;
+                    //turnLeft(angle) ;
+                } else {
+                    angle = (b - 90) ;
+                    log("  4 right " + angle ) ;
+                    //turnRight(angle) ;
+                    angle = -angle ; //then I can turnLeft(angle)
+                }
+            }
+
+            if (Math.abs(angle) < 15) {
+                log("  angle < " + angle + " so not doing anything") ;
+            } 
+            else {
+                //turnLeft(angle) ;
+                setTurnLeft(angle) ;
+            }
+        } else {
+            log("holding setting perp to bullet: " + holdSettingBodyToBullet) ;
         }
                
     }
