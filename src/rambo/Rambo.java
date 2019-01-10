@@ -20,13 +20,16 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
-    private static final double WALLMARGIN = 150 ;
+    private static final double WALLMARGIN = 50 ; //150
     private double tooCloseToWallDescrement = 3 ;
     
     String fromWhichSide = "" ;
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
             
-            
+    
+    //boolean escapingStartingAngleOpened ; //pokud true, potom muzu zapsat hodnotu do setRemainingAngle
+    //double startingEscapingAngle ;
+    
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
     boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false ;
@@ -105,9 +108,11 @@ public class Rambo extends AdvancedRobot {
 	if (e.getCondition().getName().equals("too_close_to_walls")) {
             //og("x " + getX() + "   y " + getY()) ;
             if (tooCloseToWall <= 0) {
-                log("too_close_to_walls " + fromWhichSide) ;
+                log("\n too_close_to_walls " + fromWhichSide + "\n") ;
+                log("  wallSurfaceAngle " + wallSurfaceAngle + "\n") ;
 		tooCloseToWall += WALLMARGIN;
 		setMaxVelocity(0); 
+                //escapingStartingAngleOpened = true ;
             }
 	}
     }
@@ -119,19 +124,47 @@ public class Rambo extends AdvancedRobot {
         setTurnRadarRight(360) ;
 
 	if (tooCloseToWall > 0) {
+            
             holdSettingBodyToBullet = true ;
             tooCloseToWall -= tooCloseToWallDescrement ;
-            log("doMove: wall " + tooCloseToWall) ;
-            log("doMove: holdSettingToBullet " + holdSettingBodyToBullet) ;
+            log("doMove 1: wall " + tooCloseToWall) ;
+            log("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
+
+            double moveLeftBy = normalizeBearing(getHeading()-wallSurfaceAngle) ;
+            log("doMove 1: move left by " + moveLeftBy) ;
             
-            //TODO setBodyPerpendicularToWall setBodyPerpendicularlyToBullet(NEJAKYUHEL )
+            /*
+            if (escapingStartingAngleOpened) {
+                startingEscapingAngle = Math.abs(moveLeftBy) ;
+                escapingStartingAngleOpened = false ;
+                log("doMove 1: setStartingEscapingAngle " + startingEscapingAngle) ;
+            }
+            */
+            
+            double remains = normalizeBearing(getHeading()) - normalizeBearing(wallSurfaceAngle) ;
+     
+            log("doMove 1: remains " + remains) ;
+            if (Math.abs( remains ) > 5) {
+                log("doMove 1: moving left because " + Math.abs( remains ) ) ;
+                setTurnLeft(moveLeftBy) ;
+                
+            } else {
+                setTurnLeft(0) ;
+            
+            }
+            
+            log("doMove 1: getheading " + getHeading()) ;
+            
+            
         } else {
-            log("doMove: not within wall boundary") ;
+            log("doMove 2: not within wall boundary") ;
+            log("doMove 2: getheading " + getHeading()) ;
             holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
         }
         
 	if (getVelocity() == 0) {
-            moveDirection *= -1;
+            log("doMove 3: getheading " + getHeading()) ;
+            //moveDirection *= -1;
             setMaxVelocity(Rules.MAX_VELOCITY) ;
 	}
         
@@ -194,28 +227,31 @@ public class Rambo extends AdvancedRobot {
         double x = getX() + dx ;
         double y = getY() + dy ;
 
-double firstRingRadius = 150 ;
+double firstRingRadius = 250 ;
 double secondRingRadius = 400 ;
         
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
         
         if (distance < firstRingRadius && !firstRingReached) {
-            log("reached " + firstRingRadius) ;
+            log("onScanned 1: reached " + firstRingRadius) ;
+            log("onScanned 2: setting body") ;
             setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
             firstRingReached = true ;
         }
         
         else if (distance < secondRingRadius && firstRingReached) {
-            log("withing distance " + secondRingRadius) ;
+            log("onScanned 2: withing distance " + secondRingRadius) ;
+            log("onScanned 2: setting body") ;
             setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
         }
         
         else {
             firstRingReached = false ;
-            setTurnLeft(e.getBearing()) ;
-            log("is too far") ;
+            setTurnRight(e.getBearing()) ;
+            log("onScanned 3: is too far     distance = " + distance) ;
+            log("onScanned 3: setTurnRight " + (e.getBearing())) ;
             
         }
             
