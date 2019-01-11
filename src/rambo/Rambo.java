@@ -21,9 +21,12 @@ import java.util.Map;
 public class Rambo extends AdvancedRobot {
     
     private static final double WALLMARGIN = 50 ; //150
-    private double tooCloseToWallDescrement = 3 ;
+    private static final double tooCloseToWallDescrement = 3 ;
+    private static final double firstRingRadius = 250 ;
+    private static final double secondRingRadius = 400 ;
     
-    String fromWhichSide = "" ;
+    
+    //String fromWhichSide = "" ;
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
             
     
@@ -48,6 +51,7 @@ public class Rambo extends AdvancedRobot {
         addCustomEvent(new Condition("too_close_to_walls") {
             public boolean test() {
                 boolean bol ;
+                String fromWhichSide = "" ;
                 if (getX() <= WALLMARGIN) {
                     fromWhichSide = "left" ;
                     wallSurfaceAngle = 90 ;
@@ -62,7 +66,11 @@ public class Rambo extends AdvancedRobot {
                     wallSurfaceAngle = 180 ;
                     fromWhichSide = "top" ;
                 }
-
+                
+                if (!fromWhichSide.equals("")) {
+                    log("\n  too_close_to_walls " + fromWhichSide + "\n") ;
+                }
+                
 		return (
                     // we're too close to the left wall
                     (getX() <= WALLMARGIN ||
@@ -106,9 +114,8 @@ public class Rambo extends AdvancedRobot {
     
     public void onCustomEvent(CustomEvent e) {
 	if (e.getCondition().getName().equals("too_close_to_walls")) {
-            //og("x " + getX() + "   y " + getY()) ;
             if (tooCloseToWall <= 0) {
-                log("\n too_close_to_walls " + fromWhichSide + "\n") ;
+                //log("\n too_close_to_walls " + fromWhichSide + "\n") ;
                 log("  wallSurfaceAngle " + wallSurfaceAngle + "\n") ;
 		tooCloseToWall += WALLMARGIN;
 		setMaxVelocity(0); 
@@ -226,9 +233,8 @@ public class Rambo extends AdvancedRobot {
         double dy = distance*Math.cos(absAngle) ;
         double x = getX() + dx ;
         double y = getY() + dy ;
+       
 
-double firstRingRadius = 250 ;
-double secondRingRadius = 400 ;
         
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
         
