@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
-    private static final double WALLMARGIN = 50 ; //150
+    private static final double WALLMARGIN = 150 ; //150
     private static final double tooCloseToWallDescrement = 3 ;
     private static final double firstRingRadius = 250 ;
     private static final double secondRingRadius = 400 ;
@@ -124,6 +124,16 @@ public class Rambo extends AdvancedRobot {
 	}
     }
     
+    private double getHeadingX() {
+        double out ;
+        if (moveDirection == -1) {
+            out = normalizeBearing(getHeading()+180) ;
+        } else {
+            out = normalizeBearing(getHeading()) ;
+        }
+        return out ;
+    }
+    
     private void doMove() {
         //setMaxVelocity(8) ;
         //log("searching for enemy tank...") ;
@@ -137,7 +147,7 @@ public class Rambo extends AdvancedRobot {
             log("doMove 1: wall " + tooCloseToWall) ;
             log("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
 
-            double moveLeftBy = normalizeBearing(getHeading()-wallSurfaceAngle) ;
+            double moveLeftBy = normalizeBearing(getHeadingX()-wallSurfaceAngle) ;
             log("doMove 1: move left by " + moveLeftBy) ;
             
             /*
@@ -148,7 +158,7 @@ public class Rambo extends AdvancedRobot {
             }
             */
             
-            double remains = normalizeBearing(getHeading()) - normalizeBearing(wallSurfaceAngle) ;
+            double remains = normalizeBearing(getHeadingX()) - normalizeBearing(wallSurfaceAngle) ;
      
             log("doMove 1: remains " + remains) ;
             if (Math.abs( remains ) > 5) {
@@ -160,7 +170,7 @@ public class Rambo extends AdvancedRobot {
             
             }
             
-            log("doMove 1: getheading " + getHeading()) ;
+            log("doMove 1: getheading " + getHeadingX()) ;
             
             
         } else {
@@ -240,7 +250,7 @@ public class Rambo extends AdvancedRobot {
         
         if (distance < firstRingRadius && !firstRingReached) {
             log("onScanned 1: reached " + firstRingRadius) ;
-            log("onScanned 2: setting body") ;
+            log("onScanned 1: setting body") ;
             setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
             firstRingReached = true ;
