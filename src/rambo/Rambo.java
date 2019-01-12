@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
-    private static final double WALLMARGIN = 150 ; //150
+    private static final double WALLMARGIN = 50 ; //150
     private static final double tooCloseToWallDescrement = 3 ;
     private static final double firstRingRadius = 250 ;
     private static final double secondRingRadius = 400 ;
@@ -37,7 +37,7 @@ public class Rambo extends AdvancedRobot {
    
     boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false ;
     
-    int moveDirection = 1 ;
+    int moveDirection = -1 ;
     
     private int tooCloseToWall = 0;
     
@@ -124,7 +124,7 @@ public class Rambo extends AdvancedRobot {
 	}
     }
     
-    private double getHeadingX() {
+    private double getHeadingInvariant() {
         double out ;
         if (moveDirection == -1) {
             out = normalizeBearing(getHeading()+180) ;
@@ -147,7 +147,7 @@ public class Rambo extends AdvancedRobot {
             log("doMove 1: wall " + tooCloseToWall) ;
             log("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
 
-            double moveLeftBy = normalizeBearing(getHeadingX()-wallSurfaceAngle) ;
+            double moveLeftBy = normalizeBearing(getHeadingInvariant()-wallSurfaceAngle) ;
             log("doMove 1: move left by " + moveLeftBy) ;
             
             /*
@@ -158,7 +158,7 @@ public class Rambo extends AdvancedRobot {
             }
             */
             
-            double remains = normalizeBearing(getHeadingX()) - normalizeBearing(wallSurfaceAngle) ;
+            double remains = normalizeBearing(getHeadingInvariant()) - normalizeBearing(wallSurfaceAngle) ;
      
             log("doMove 1: remains " + remains) ;
             if (Math.abs( remains ) > 5) {
@@ -167,20 +167,20 @@ public class Rambo extends AdvancedRobot {
                 
             } else {
                 setTurnLeft(0) ;
-            
             }
             
-            log("doMove 1: getheading " + getHeadingX()) ;
+            log("doMove 1: getheading " + getHeadingInvariant()) ;
             
             
         } else {
             log("doMove 2: not within wall boundary") ;
-            log("doMove 2: getheading " + getHeading()) ;
+            log("doMove 2: getheading " + getHeadingInvariant()) ;
             holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
         }
         
-	if (getVelocity() == 0) {
-            log("doMove 3: getheading " + getHeading()) ;
+        //is valid also for the battle beginning since the tank starts at zero velocity
+	if (getVelocity() == 0) { 
+            log("doMove 3: getheading " + getHeadingInvariant()) ;
             //moveDirection *= -1;
             setMaxVelocity(Rules.MAX_VELOCITY) ;
 	}
@@ -203,7 +203,9 @@ public class Rambo extends AdvancedRobot {
         
         double distance = e.getDistance() ;
   
-        enemy.set(distance,e.getVelocity(),normalizeBearing((getHeading() + e.getBearing())),e.getHeading(),getTime()) ;
+        double e_bearing = getAngleInvariant(e.getBearing()) ;
+        
+        enemy.set(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e.getBearing())),e.getHeading(),getTime()) ;
 
         log("  additional targetting") ;
         double firepower = 1 ;
@@ -246,7 +248,7 @@ public class Rambo extends AdvancedRobot {
        
 
         
-        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeading() + e.getBearing()))) ;
+        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e.getBearing()))) ;
         
         if (distance < firstRingRadius && !firstRingReached) {
             log("onScanned 1: reached " + firstRingRadius) ;
@@ -254,6 +256,7 @@ public class Rambo extends AdvancedRobot {
             setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
             firstRingReached = true ;
+            moveDirection *= -1 ;
         }
         
         else if (distance < secondRingRadius && firstRingReached) {
@@ -265,7 +268,8 @@ public class Rambo extends AdvancedRobot {
         
         else {
             firstRingReached = false ;
-            setTurnRight(e.getBearing()) ;
+            //setTurn() ;
+            setTurnRight( getAngleInvariant(e.getBearing()) ) ;
             log("onScanned 3: is too far     distance = " + distance) ;
             log("onScanned 3: setTurnRight " + (e.getBearing())) ;
             
@@ -273,8 +277,18 @@ public class Rambo extends AdvancedRobot {
             
         
         
-        
 
+    }
+
+    // 
+    private double getAngleInvariant(double angle) { 
+        double out ;
+        if (moveDirection == -1) {
+            out = normalizeBearing(angle + 180) ;
+        } else {
+            out = normalizeBearing(angle) ;
+        }
+        return out ;
     }
 
 	/**
@@ -285,7 +299,7 @@ public class Rambo extends AdvancedRobot {
     }
     
     private double gunToBody() {
-        double angle = getGunHeading() - getHeading() ;
+        double angle = getGunHeading() - getHeadingInvariant() ;
         return normalizeBearing(angle) ;
     }
     
@@ -350,13 +364,7 @@ public class Rambo extends AdvancedRobot {
             
     
     public void onHitByBullet(HitByBulletEvent e) {        
-       // log("rel: " + e.getBearing() + " abs: " + (getHeading() + e.getBearing())) ;
-       //setAdjustRadarForRobotTurn(true) ;
-       //setGun(e.getBearing()) ;
-       //setBodyPerpendicularlyToBullet(e) ;
-       
-       
-
+        moveDirection *= -1 ;
     }
 
 
