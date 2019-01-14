@@ -33,12 +33,12 @@ public class Rambo extends AdvancedRobot {
     }
     
     public <T> void log(T t) {
-    //    System.out.println(t) ;
+        System.out.println(t) ;
     }
     
-    private static final double WALLMARGIN = 50; //150
+    private static final double WALLMARGIN = 160 ; //150
     private static final double tooCloseToWallDescrement = 3 ;
-    private static final double firstRingRadius = 200 ;
+    private static final double firstRingRadius = 100 ;
     private static final double secondRingRadius = 500 ;
     private static final double FIXINGDB = 12 ;
     
@@ -56,7 +56,7 @@ public class Rambo extends AdvancedRobot {
     
     int moveDirection = -1 ;
     
-    
+    boolean tooCloseToWallLock = false ;
     
     private int tooCloseToWall = 0;
     
@@ -88,7 +88,7 @@ public class Rambo extends AdvancedRobot {
                 
                 if (!fromWhichSide.equals("")) {
                     log("\n  too_close_to_walls " + fromWhichSide + "\n") ;
-                }
+                } 
                 
 		return (
                     // we're too close to the left wall
@@ -117,11 +117,7 @@ public class Rambo extends AdvancedRobot {
         boolean stop = false ;
 
         while(true) {
-            //if (!stop) {
-            //    turnGunRight(70) ;
-            //    log(gunToBody()) ;
-            //    stop = true ;
-            // }
+            
             logFire("  getTime " + getTime()) ;
             doMove(); 
             execute() ;
@@ -133,13 +129,12 @@ public class Rambo extends AdvancedRobot {
     
     public void onCustomEvent(CustomEvent e) {
 	if (e.getCondition().getName().equals("too_close_to_walls")) {
-            if (tooCloseToWall <= 0) {
-                //log("\n too_close_to_walls " + fromWhichSide + "\n") ;
+            
+            if (!tooCloseToWallLock) {
                 log("  wallSurfaceAngle " + wallSurfaceAngle + "\n") ;
-		tooCloseToWall += WALLMARGIN;
-		setMaxVelocity(0); 
-                //escapingStartingAngleOpened = true ;
+                tooCloseToWallLock = true ;
             }
+           
 	}
     }
     
@@ -154,13 +149,13 @@ public class Rambo extends AdvancedRobot {
     }
     
     private void doMove() {
-        //setMaxVelocity(8) ;
-        //log("searching for enemy tank...") ;
+
         setAhead(1000*moveDirection) ;
         setTurnRadarRight(360) ;
 
-	if (tooCloseToWall > 0) {
-            
+	//if (tooCloseToWall > 0) {
+        if (tooCloseToWallLock) {    
+            setMaxVelocity(Rules.MAX_VELOCITY*0.7);
             holdSettingBodyToBullet = true ;
             tooCloseToWall -= tooCloseToWallDescrement ;
             logMove("doMove 1: wall " + tooCloseToWall) ;
@@ -186,25 +181,18 @@ public class Rambo extends AdvancedRobot {
                 
             } else {
                 setTurnLeft(0) ;
+                tooCloseToWallLock = false ;
             }
             
             logMove("doMove 1: getheading " + getHeadingInvariant()) ;
             
             
         } else {
+            setMaxVelocity(Rules.MAX_VELOCITY);
             logMove("doMove 2: not within wall boundary") ;
             logMove("doMove 2: getheading " + getHeadingInvariant()) ;
             holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
         }
-        
-        //is valid also for the battle beginning since the tank starts at zero velocity
-	if (getVelocity() == 0) { 
-            logMove("doMove 3: getheading " + getHeadingInvariant()) ;
-            //moveDirection *= -1;
-            //setMaxVelocity(Rules.MAX_VELOCITY) ;
-            setMaxVelocity(0) ;
-	}
-        
         
     }
     
@@ -291,8 +279,8 @@ public class Rambo extends AdvancedRobot {
         else {
             firstRingReached = false ;
             approachingEnemy = true ;
-            setTurnRight( e_bearing ) ; 
-setWhenClose(e) ;
+            //setTurnRight( e_bearing ) ; 
+//setWhenClose(e) ;
             logRadar("onScanned 3: is too far     distance = " + distance) ;
             logRadar("onScanned 3: setTurnRight " + e_bearing ) ;
         }
