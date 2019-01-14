@@ -22,8 +22,8 @@ public class Rambo extends AdvancedRobot {
     
     private static final double WALLMARGIN = 50 ; //150
     private static final double tooCloseToWallDescrement = 3 ;
-    private static final double firstRingRadius = 250 ;
-    private static final double secondRingRadius = 400 ;
+    private static final double firstRingRadius = 450 ;
+    private static final double secondRingRadius = 600 ;
     
     
     //String fromWhichSide = "" ;
@@ -205,7 +205,7 @@ public class Rambo extends AdvancedRobot {
   
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         
-        enemy.set(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e.getBearing())),e.getHeading(),getTime()) ;
+        enemy.set(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading(),getTime()) ;
 
         log("  additional targetting") ;
         double firepower = 1 ;
@@ -221,9 +221,9 @@ public class Rambo extends AdvancedRobot {
         double errT1 = getTime() ;
         // until setGun is done, radar moving is off
         if (!this.moveGRtogether) 
-            setGun(e.getBearing() + enemy.getAdditionalAngle()) ;
+            setGun(e_bearing + enemy.getAdditionalAngle()) ;
         else
-            setGun(e.getBearing() + enemy.getAdditionalAngle()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
+            setGun(e_bearing + enemy.getAdditionalAngle()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
         
         double errDt = getTime() - errT1 ;
         log("               error due to move before fire and after setting angles " + errDt) ;
@@ -245,8 +245,6 @@ public class Rambo extends AdvancedRobot {
         double dy = distance*Math.cos(absAngle) ;
         double x = getX() + dx ;
         double y = getY() + dy ;
-       
-
         
         log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e.getBearing()))) ;
         
@@ -264,6 +262,7 @@ public class Rambo extends AdvancedRobot {
             log("onScanned 2: setting body") ;
             setBodyPerpendicularlyToBullet(e.getBearing()) ;
             setWhenClose(e) ;
+            
         }
         
         else {
@@ -274,10 +273,6 @@ public class Rambo extends AdvancedRobot {
             log("onScanned 3: setTurnRight " + (e.getBearing())) ;
             
         }
-            
-        
-        
-
     }
 
     // 
