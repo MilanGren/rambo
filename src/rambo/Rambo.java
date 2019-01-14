@@ -20,10 +20,27 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
-    private static final double WALLMARGIN = 50 ; //150
+    public <T> void logMove(T t) {
+    //    System.out.println(t) ;
+    }
+    
+    public <T> void logFire(T t) {
+        System.out.println(t) ;
+    }
+    
+    public <T> void logRadar(T t) {
+    //    System.out.println(t) ;
+    }
+    
+    public <T> void log(T t) {
+    //    System.out.println(t) ;
+    }
+    
+    private static final double WALLMARGIN = 50; //150
     private static final double tooCloseToWallDescrement = 3 ;
-    private static final double firstRingRadius = 450 ;
-    private static final double secondRingRadius = 600 ;
+    private static final double firstRingRadius = 200 ;
+    private static final double secondRingRadius = 500 ;
+    private static final double FIXINGDB = 12 ;
     
     
     //String fromWhichSide = "" ;
@@ -35,9 +52,11 @@ public class Rambo extends AdvancedRobot {
     
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
-    boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false ;
+    boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false, approachingEnemy ;
     
     int moveDirection = -1 ;
+    
+    
     
     private int tooCloseToWall = 0;
     
@@ -103,7 +122,7 @@ public class Rambo extends AdvancedRobot {
             //    log(gunToBody()) ;
             //    stop = true ;
             // }
-            
+            logFire("  getTime " + getTime()) ;
             doMove(); 
             execute() ;
             log("") ;
@@ -144,11 +163,11 @@ public class Rambo extends AdvancedRobot {
             
             holdSettingBodyToBullet = true ;
             tooCloseToWall -= tooCloseToWallDescrement ;
-            log("doMove 1: wall " + tooCloseToWall) ;
-            log("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
+            logMove("doMove 1: wall " + tooCloseToWall) ;
+            logMove("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
 
             double moveLeftBy = normalizeBearing(getHeadingInvariant()-wallSurfaceAngle) ;
-            log("doMove 1: move left by " + moveLeftBy) ;
+            logMove("doMove 1: move left by " + moveLeftBy) ;
             
             /*
             if (escapingStartingAngleOpened) {
@@ -160,29 +179,30 @@ public class Rambo extends AdvancedRobot {
             
             double remains = normalizeBearing(getHeadingInvariant()) - normalizeBearing(wallSurfaceAngle) ;
      
-            log("doMove 1: remains " + remains) ;
+            logMove("doMove 1: remains " + remains) ;
             if (Math.abs( remains ) > 5) {
-                log("doMove 1: moving left because " + Math.abs( remains ) ) ;
+                logMove("doMove 1: moving left because " + Math.abs( remains ) ) ;
                 setTurnLeft(moveLeftBy) ;
                 
             } else {
                 setTurnLeft(0) ;
             }
             
-            log("doMove 1: getheading " + getHeadingInvariant()) ;
+            logMove("doMove 1: getheading " + getHeadingInvariant()) ;
             
             
         } else {
-            log("doMove 2: not within wall boundary") ;
-            log("doMove 2: getheading " + getHeadingInvariant()) ;
+            logMove("doMove 2: not within wall boundary") ;
+            logMove("doMove 2: getheading " + getHeadingInvariant()) ;
             holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
         }
         
         //is valid also for the battle beginning since the tank starts at zero velocity
 	if (getVelocity() == 0) { 
-            log("doMove 3: getheading " + getHeadingInvariant()) ;
+            logMove("doMove 3: getheading " + getHeadingInvariant()) ;
             //moveDirection *= -1;
-            setMaxVelocity(Rules.MAX_VELOCITY) ;
+            //setMaxVelocity(Rules.MAX_VELOCITY) ;
+            setMaxVelocity(0) ;
 	}
         
         
@@ -194,10 +214,7 @@ public class Rambo extends AdvancedRobot {
 	return angle;
     }
     
-    public <T> void log(T t) {
-        System.out.println(t) ;
-    }
-    
+
     
     public void setWhenClose(ScannedRobotEvent e) {
         
@@ -207,8 +224,9 @@ public class Rambo extends AdvancedRobot {
         
         enemy.set(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading(),getTime()) ;
 
-        log("  additional targetting") ;
         double firepower = 1 ;
+        logFire("additional targetting, firepower" + firepower) ; 
+        logFire( Rules.MAX_BULLET_POWER ) ;
         enemy.fin(20 - 3*firepower) ;
                 
         //setGun is happening when moving tank body
@@ -217,61 +235,66 @@ public class Rambo extends AdvancedRobot {
         // ... i don't need to solve that.
     
         //setBodyPerpendicularlyToBullet(e.getBearing()) ;
-        log( "!!!!!!!!!!!!!!!! +   " + enemy.getAdditionalAngle() ) ;
+        
         double errT1 = getTime() ;
         // until setGun is done, radar moving is off
-        if (!this.moveGRtogether) 
-            setGun(e_bearing + enemy.getAdditionalAngle()) ;
-        else
-            setGun(e_bearing + enemy.getAdditionalAngle()) ; //pokud vypnuto, hlaven se pretoci a strela jde hodne mimo
+
+        setGun(e_bearing + enemy.getAdditionalAngle()) ;
+
         
         double errDt = getTime() - errT1 ;
-        log("               error due to move before fire and after setting angles " + errDt) ;
+        //logFire("               error due to move before fire and after setting angles " + errDt) ;
         
-
+        logFire("getGunHeat " + getGunHeat()) ;
         if (getGunHeat() <= 0) {
-            log("fire!") ;
+            double energy = getEnergy() ;
+            logFire("fire!") ;
+            
             fire(firepower) ;
+            double gh = 1+firepower/5 ;
+        //    logFire("  getEnergy() " + energy + "  gunHeat " + getGunHeat() + " gunHeat " + gh) ;
         } else {
-            log("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
+        //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
     }
     
     public void onScannedRobot(ScannedRobotEvent e) {
         double distance = e.getDistance() ;
-        double angle = e.getBearingRadians() ;
-        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
-        double dx = distance*Math.sin(absAngle) ;
-        double dy = distance*Math.cos(absAngle) ;
-        double x = getX() + dx ;
-        double y = getY() + dy ;
-        
-        log("enemy relative angle " + e.getBearing() + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e.getBearing()))) ;
+        //double angle = e.getBearingRadians() ;
+        //double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
+        //double dx = distance*Math.sin(absAngle) ;
+        //double dy = distance*Math.cos(absAngle) ;
+        //double x = getX() + dx ;
+        //double y = getY() + dy ;
+        double e_bearing = getAngleInvariant(e.getBearing()) ;
+        logRadar("enemy relative angle " + e_bearing + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e_bearing))) ;
         
         if (distance < firstRingRadius && !firstRingReached) {
-            log("onScanned 1: reached " + firstRingRadius) ;
-            log("onScanned 1: setting body") ;
-            setBodyPerpendicularlyToBullet(e.getBearing()) ;
+            logRadar("onScanned 1: reached " + firstRingRadius) ;
+            logRadar("onScanned 1: setting body by " + e_bearing) ;
+            approachingEnemy = false ;
+            setBodyToEnemy(e_bearing,distance) ;
             setWhenClose(e) ;
             firstRingReached = true ;
-            moveDirection *= -1 ;
+            //moveDirection *= -1 ;
         }
         
-        else if (distance < secondRingRadius && firstRingReached) {
-            log("onScanned 2: withing distance " + secondRingRadius) ;
-            log("onScanned 2: setting body") ;
-            setBodyPerpendicularlyToBullet(e.getBearing()) ;
+        else if (distance < secondRingRadius && firstRingReached) { // pokracuj v prvnim bode, dokud distance < secondRingRadiu
+            logRadar("onScanned 2: withing distance " + secondRingRadius) ;
+            logRadar("onScanned 2: setting body by " + e_bearing) ;
+            approachingEnemy = false ;
+            setBodyToEnemy(e_bearing,distance) ;
             setWhenClose(e) ;
             
         }
         
         else {
             firstRingReached = false ;
-            //setTurn() ;
-            setTurnRight( getAngleInvariant(e.getBearing()) ) ;
-            log("onScanned 3: is too far     distance = " + distance) ;
-            log("onScanned 3: setTurnRight " + (e.getBearing())) ;
-            
+            approachingEnemy = true ;
+            setTurnRight( e_bearing ) ; 
+setWhenClose(e) ;
+            logRadar("onScanned 3: is too far     distance = " + distance) ;
+            logRadar("onScanned 3: setTurnRight " + e_bearing ) ;
         }
     }
 
@@ -290,7 +313,7 @@ public class Rambo extends AdvancedRobot {
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
     public void onHitWall(HitWallEvent e) {
-        this.moveDirection *= -1 ;
+        //this.moveDirection *= -1 ;
     }
     
     private double gunToBody() {
@@ -299,10 +322,10 @@ public class Rambo extends AdvancedRobot {
     }
     
     private void setGun(double angle) {
-        log("targetting") ;
-        //log("  gunToBody " + gunToBody() + " bullet from " + angle) ;
+        logFire("targetting") ;
+        //logFire("  gunToBody " + gunToBody() + " bullet from " + angle) ;
         double moveGunBy = angle - gunToBody() ;
-        log("  moveGunBy " + moveGunBy) ;
+        logFire("  moveGunBy " + moveGunBy) ;
         turnGunRight(normalizeBearing(moveGunBy)) ;
         //setTurnGunRight(normalizeBearing(moveGunBy)) ;
         //execute() ;
@@ -310,56 +333,86 @@ public class Rambo extends AdvancedRobot {
     }
     
     //TODO: nemelo by fungovat uplne vzdy, staci mimo ramec +-20 stupnu       
-    private void setBodyPerpendicularlyToBullet(double b) {
+    private void setBodyToEnemy(double b,double distance) {
 //log("setBodyPerpendicularlyToBullet hold  = " + holdSettingToBullet) ;        
         if (holdSettingBodyToBullet == false) {
         
-            double angle ;
-        
-            log("move body by") ;
-        
-            if (b <= 0) {
-                if ( b >= -90) {
-                    angle = 90 + b ;
-                    log("  1 right " + angle) ;
-                    //turnRight(angle) ;
-                    angle = -angle ; ///then I can turnLeft(angle)
-                } else {
-                    //angle = 90 - (180 + b) ;
-                    angle = -b - 90 ;
-                    log("  2 left " + angle) ;
-                    //turnLeft(angle) ;
-                }            
-            }
-            else {            
-                if ( b <= 90) {
-                    angle = (90 - b) ;
-                    log("  3 left " + angle) ;
-                    //turnLeft(angle) ;
-                } else {
-                    angle = (b - 90) ;
-                    log("  4 right " + angle ) ;
-                    //turnRight(angle) ;
-                    angle = -angle ; //then I can turnLeft(angle)
-                }
+            double angle = 0;
+            double bfixed = 0;
+            double anglefixed = 0 ;
+            double fixingdb = 0;
+            
+            logMove("setting body to enemy") ;
+            
+            logMove("  " + distance + " / " + firstRingRadius) ;
+            
+            if (distance < firstRingRadius && b>= 0) { //chci se oddalit
+                    fixingdb = FIXINGDB ; //kladny uhel doleva
+                    logMove("  1 get away") ;
+            } else if (distance > firstRingRadius && b>= 0) { //chci se priblizit
+                    fixingdb = -FIXINGDB ; //zaporny uhel doleva
+                    logMove("  2 get closer") ;
+            } else if (distance < firstRingRadius && b < 0) { //chci se oddalit
+                    fixingdb = -FIXINGDB ; // 
+                    logMove("  3 get away") ;
+            } else if (distance > firstRingRadius && b < 0) {
+                    fixingdb = FIXINGDB ; // 
+                    logMove("  4 get closer") ;
             }
 
-            if (Math.abs(angle) < 15) {
-                log("  angle < " + angle + " so not doing anything") ;
-            } 
-            else {
+            angle = getAngleToEnemyDefault(b) ;     
+            logMove(  "no   fix " + angle) ;
+            angle = angle + fixingdb ;
+            logMove(  "with fix " + angle) ;
+            
+            //if (Math.abs(angle) < 1) {
+            //    logMove("  angle < " + anglefixed + " so not doing anything") ;
+            //} 
+            //else {
                 //turnLeft(angle) ;
                 setTurnLeft(angle) ;
-            }
+            //}
         } else {
-            log("holding setting perp to bullet: " + holdSettingBodyToBullet) ;
+            logMove("holding setting perp to bullet: " + holdSettingBodyToBullet) ;
         }
                
     }
-            
+    
+    public double getAngleToEnemyDefault(double b) {
+        double angle = 0 ;
+        if (b <= 0) {
+            if ( b >= -90) { // -90 .. 0
+                angle = 90 + b ;
+                logMove("  1 right " + angle) ;
+                angle = -angle ;
+            } else {
+                angle = -b - 90 ;
+                logMove("  2 left " + angle) ;
+            }            
+        }
+        else {              
+            if ( b <= 90) {
+                  angle = (90 - b) ;
+                logMove("  3 left " + angle) ;
+            } else {
+                angle = (b - 90) ;
+                logMove("  4 right " + angle) ;
+                angle = -angle ; 
+            }
+        }
+        return angle ;
+    }
+    
     
     public void onHitByBullet(HitByBulletEvent e) {        
-        moveDirection *= -1 ;
+        if (!approachingEnemy) {
+            moveDirection *= -1 ;
+        } else {
+            //moveDirection *= -1 ;
+        }
+        
+        
+        
     }
 
 
