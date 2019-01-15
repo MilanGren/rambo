@@ -36,11 +36,11 @@ public class Rambo extends AdvancedRobot {
     }
     
     public <T> void logRadar(T t) {
-        System.out.println(t) ;
+    //    System.out.println(t) ;
     }
     
     public <T> void log(T t) {
-    //    System.out.println(t) ;
+        System.out.println(t) ;
     }
     
     private static final double WALLMARGIN = 160 ; //150
@@ -159,19 +159,22 @@ public class Rambo extends AdvancedRobot {
     }
     
     private void doMove() {
-
+        log(getTime()) ;
         setAhead(1000*moveDirection) ;
 
+        //setTurnRadarRight(360) ;
+        
         if (!enemyWasFoundFirstTime) {
-            setTurnRadarRight(2) ;
+            setTurnRadarRight(90) ;
         } else {
-            logRadar(angleToEnemy) ;
-        //    logRadar(angleToEnemy) ;
-         //   logRadar(enemyWasFoundFirstTime) ;
+            
+            
+            
             setTurnRadarRight(angleToEnemy) ;
-            //setTurnRadarRight(angleToEnemy) ;
         }
-
+        
+        
+        
         
         
         if (tooCloseToWallLock) {    
@@ -216,7 +219,7 @@ public class Rambo extends AdvancedRobot {
 
     
     public void setWhenClose(ScannedRobotEvent e) {
-        
+        log("setWhen close BEGIN") ;
         double distance = e.getDistance() ;
   
         double e_bearing = getAngleInvariant(e.getBearing()) ;
@@ -243,7 +246,7 @@ public class Rambo extends AdvancedRobot {
         
         double errDt = getTime() - errT1 ;
         //logFire("               error due to move before fire and after setting angles " + errDt) ;
-        
+        log("x") ;
         logFire("getGunHeat " + getGunHeat()) ;
         if (getGunHeat() <= 0) {
             double energy = getEnergy() ;
@@ -255,6 +258,7 @@ public class Rambo extends AdvancedRobot {
         } else {
         //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
+        log("setWhen close END") ;
     }
     
     public double scalar(double[] a,double[] b) {
@@ -330,7 +334,7 @@ public class Rambo extends AdvancedRobot {
             firstRingReached = false ;
             approachingEnemy = true ;
             //setTurnRight( e_bearing ) ; 
-//setWhenClose(e) ;
+setWhenClose(e) ;
             logRadar("onScanned 3: is too far     distance = " + distance) ;
             logRadar("onScanned 3: setTurnRight " + e_bearing ) ;
         }
