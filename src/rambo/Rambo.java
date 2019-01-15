@@ -36,15 +36,15 @@ public class Rambo extends AdvancedRobot {
     }
     
     public <T> void logRadar(T t) {
-    //    System.out.println(t) ;
-    }
-    
-    public <T> void log(T t) {
         System.out.println(t) ;
     }
     
+    public <T> void log(T t) {
+     //   System.out.println(t) ;
+    }
+    
     private static final double WALLMARGIN = 160 ; //150
-    private static final double firstRingRadius = 100 ;
+    private static final double firstRingRadius = 300 ;
     private static final double secondRingRadius = 500 ;
     private static final double FIXINGDB = 12 ;
     
@@ -53,9 +53,9 @@ public class Rambo extends AdvancedRobot {
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
      
     
-    double absAngle_prev ;
-    double dx_prev ;
-    double dy_prev ;
+    double absAngle_prev, absAngle_actual ;
+    double dx_prev, dx_enemy ;
+    double dy_prev, dy_enemy ;
     
     //boolean escapingStartingAngleOpened ; //pokud true, potom muzu zapsat hodnotu do setRemainingAngle
     //double startingEscapingAngle ;
@@ -154,9 +154,6 @@ public class Rambo extends AdvancedRobot {
         return out ;
     }
     
-    private void setRadar() {
-        
-    }
     
     private void doMove() {
         log(getTime()) ;
@@ -167,10 +164,21 @@ public class Rambo extends AdvancedRobot {
         if (!enemyWasFoundFirstTime) {
             setTurnRadarRight(90) ;
         } else {
+            double dx_radar = 1*Math.sin(getRadarHeadingRadians()) ;    
+            double dy_radar = 1*Math.cos(getRadarHeadingRadians()) ;
+                    
+            double[] vecRadar = {dx_radar,dy_radar} ;
+            double[] vecEnemy = {dx_enemy,dy_enemy} ;
             
             
+            logRadar("\n") ;
+            logRadar(vecRadar[0] + ", " + vecRadar[1] + " .. radar vec") ;
+            logRadar(vecEnemy[0] + ", " + vecEnemy[1] + " .. enemy vec") ;
+            logRadar("\n") ;
+            double dire = direction(vecEnemy,vecRadar) ;
             
-            setTurnRadarRight(angleToEnemy) ;
+            logRadar(".... direction to enemy " + dire) ;
+            setTurnRadarRight(dire*60) ;
         }
         
         
@@ -266,48 +274,33 @@ public class Rambo extends AdvancedRobot {
         double sizeB = Math.pow((Math.pow(b[0],2) + Math.pow(b[1],2)),0.5) ;
         double cosAlpha = (a[0]*b[0]+a[1]*b[1])/sizeA/sizeB ;
         double direction ;
-        
         if (a[0]*b[1] - a[1]*b[0] < 0) {
             direction = -1 ;
         } else {
             direction = 1 ;
         }
-        
         return toDeg(direction*Math.acos(cosAlpha)) ;
-        
+    }
+    
+    
+    public double direction(double[] a,double[] b) {
+        double direction ;
+        if (a[0]*b[1] - a[1]*b[0] < 0) {
+            direction = -1 ;
+        } else {
+            direction = 1 ;
+        }
+        return direction ;
     }
     
     public void onScannedRobot(ScannedRobotEvent e) {
         double distance = e.getDistance() ;
-        //double angle = e.getBearingRadians() ;
-        if (!enemyWasFoundFirstTime) {
-            logRadar("..... enemy found first time") ;
-            absAngle_prev = getHeadingRadians() + e.getBearingRadians() ;        
-            dx_prev = distance*Math.sin(absAngle_prev) ;
-            dy_prev = distance*Math.cos(absAngle_prev) ;
-            enemyWasFoundFirstTime = true ;
-            angleToEnemy = 1 ;
-        } else {
-            logRadar("..... enemy found OTHER time") ;
-            double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
-            double dx = distance*Math.sin(absAngle) ;
-            double dy = distance*Math.cos(absAngle) ;
-            double[] xAry = {dx,dy} ;
-            double[] xAry_prev = {dx_prev,dy_prev} ;
-            logRadar(xAry[0] + ", " + xAry[1]) ;
-            logRadar(xAry_prev[0] + ", " + xAry_prev[1]) ;
-            angleToEnemy = 1*scalar(xAry,xAry_prev) ;
-            logRadar(".... angle to enemy " + angleToEnemy) ;
-            
-            dx_prev = dx ;
-            dy_prev = dy ;
 
-        }
-        //double x = getX() + dx ;
-        //double y = getY() + dy ;
-        
-        
-        
+        absAngle_actual = getHeadingRadians() + e.getBearingRadians() ;        
+        dx_enemy = distance*Math.sin(absAngle_actual) ;
+        dy_enemy = distance*Math.cos(absAngle_actual) ;
+        enemyWasFoundFirstTime = true ;
+
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         logRadar("enemy relative angle " + e_bearing + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e_bearing))) ;
         
@@ -333,8 +326,8 @@ public class Rambo extends AdvancedRobot {
         else {
             firstRingReached = false ;
             approachingEnemy = true ;
-            //setTurnRight( e_bearing ) ; 
-setWhenClose(e) ;
+            setTurnRight( e_bearing ) ; 
+//setWhenClose(e) ;
             logRadar("onScanned 3: is too far     distance = " + distance) ;
             logRadar("onScanned 3: setTurnRight " + e_bearing ) ;
         }
