@@ -19,25 +19,31 @@ import java.util.Map;
 //TODO - dodelat silu strely jako funkci polohy - cim dal, tim slabsi strela
 
 public class Rambo extends AdvancedRobot {
+    protected double toRad(double x) {
+        return x*Math.PI/180 ; 
+    }
+    
+    protected double toDeg(double x) {
+        return x*180/Math.PI ;
+    }
     
     public <T> void logMove(T t) {
     //    System.out.println(t) ;
     }
     
     public <T> void logFire(T t) {
-        System.out.println(t) ;
-    }
-    
-    public <T> void logRadar(T t) {
     //    System.out.println(t) ;
     }
     
-    public <T> void log(T t) {
+    public <T> void logRadar(T t) {
         System.out.println(t) ;
     }
     
+    public <T> void log(T t) {
+    //    System.out.println(t) ;
+    }
+    
     private static final double WALLMARGIN = 160 ; //150
-    private static final double tooCloseToWallDescrement = 3 ;
     private static final double firstRingRadius = 100 ;
     private static final double secondRingRadius = 500 ;
     private static final double FIXINGDB = 12 ;
@@ -45,21 +51,25 @@ public class Rambo extends AdvancedRobot {
     
     //String fromWhichSide = "" ;
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
-            
+     
+    
+    double absAngle_prev ;
+    double dx_prev ;
+    double dy_prev ;
     
     //boolean escapingStartingAngleOpened ; //pokud true, potom muzu zapsat hodnotu do setRemainingAngle
     //double startingEscapingAngle ;
     
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
-    boolean moveGRtogether, firstRingReached = false, holdSettingBodyToBullet = false, approachingEnemy ;
+    double angleToEnemy ; //uhel mezi predchozim a aktualnim monitoringem nepritele
+    
+    boolean firstRingReached = false, setBodyToEnemyLock = false, approachingEnemy, enemyWasFoundFirstTime = false ;
     
     int moveDirection = -1 ;
     
     boolean tooCloseToWallLock = false ;
-    
-    private int tooCloseToWall = 0;
-    
+        
     Map<Double, Double> map = new HashMap<>() ;
     
     Enemy enemy = new Enemy() ;
@@ -107,11 +117,7 @@ public class Rambo extends AdvancedRobot {
         
         setColors(Color.blue,Color.yellow,Color.white); // body,gun,radar
 
-        if (!moveGRtogether)
-            setAdjustRadarForGunTurn(true) ;
-        else
-            setAdjustRadarForGunTurn(false) ;
-                
+        setAdjustRadarForGunTurn(true) ;
         setAdjustGunForRobotTurn(true) ;
         
         boolean stop = false ;
@@ -148,29 +154,33 @@ public class Rambo extends AdvancedRobot {
         return out ;
     }
     
+    private void setRadar() {
+        
+    }
+    
     private void doMove() {
 
         setAhead(1000*moveDirection) ;
-        setTurnRadarRight(360) ;
 
-	//if (tooCloseToWall > 0) {
+        if (!enemyWasFoundFirstTime) {
+            setTurnRadarRight(2) ;
+        } else {
+            logRadar(angleToEnemy) ;
+        //    logRadar(angleToEnemy) ;
+         //   logRadar(enemyWasFoundFirstTime) ;
+            setTurnRadarRight(angleToEnemy) ;
+            //setTurnRadarRight(angleToEnemy) ;
+        }
+
+        
+        
         if (tooCloseToWallLock) {    
             setMaxVelocity(Rules.MAX_VELOCITY*0.7);
-            holdSettingBodyToBullet = true ;
-            tooCloseToWall -= tooCloseToWallDescrement ;
-            logMove("doMove 1: wall " + tooCloseToWall) ;
-            logMove("doMove 1: holdSettingToBullet " + holdSettingBodyToBullet) ;
+            setBodyToEnemyLock = true ;
+            logMove("doMove 1: holdSettingToBullet " + setBodyToEnemyLock) ;
 
             double moveLeftBy = normalizeBearing(getHeadingInvariant()-wallSurfaceAngle) ;
             logMove("doMove 1: move left by " + moveLeftBy) ;
-            
-            /*
-            if (escapingStartingAngleOpened) {
-                startingEscapingAngle = Math.abs(moveLeftBy) ;
-                escapingStartingAngleOpened = false ;
-                log("doMove 1: setStartingEscapingAngle " + startingEscapingAngle) ;
-            }
-            */
             
             double remains = normalizeBearing(getHeadingInvariant()) - normalizeBearing(wallSurfaceAngle) ;
      
@@ -189,9 +199,10 @@ public class Rambo extends AdvancedRobot {
             
         } else {
             setMaxVelocity(Rules.MAX_VELOCITY);
+            //setMaxVelocity(0) ;
             logMove("doMove 2: not within wall boundary") ;
             logMove("doMove 2: getheading " + getHeadingInvariant()) ;
-            holdSettingBodyToBullet = false ; //pokud jsem uniknul ...
+            setBodyToEnemyLock = false ; //pokud jsem uniknul ...
         }
         
     }
@@ -246,14 +257,53 @@ public class Rambo extends AdvancedRobot {
         }
     }
     
+    public double scalar(double[] a,double[] b) {
+        double sizeA = Math.pow((Math.pow(a[0],2) + Math.pow(a[1],2)),0.5) ;
+        double sizeB = Math.pow((Math.pow(b[0],2) + Math.pow(b[1],2)),0.5) ;
+        double cosAlpha = (a[0]*b[0]+a[1]*b[1])/sizeA/sizeB ;
+        double direction ;
+        
+        if (a[0]*b[1] - a[1]*b[0] < 0) {
+            direction = -1 ;
+        } else {
+            direction = 1 ;
+        }
+        
+        return toDeg(direction*Math.acos(cosAlpha)) ;
+        
+    }
+    
     public void onScannedRobot(ScannedRobotEvent e) {
         double distance = e.getDistance() ;
         //double angle = e.getBearingRadians() ;
-        //double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
-        //double dx = distance*Math.sin(absAngle) ;
-        //double dy = distance*Math.cos(absAngle) ;
+        if (!enemyWasFoundFirstTime) {
+            logRadar("..... enemy found first time") ;
+            absAngle_prev = getHeadingRadians() + e.getBearingRadians() ;        
+            dx_prev = distance*Math.sin(absAngle_prev) ;
+            dy_prev = distance*Math.cos(absAngle_prev) ;
+            enemyWasFoundFirstTime = true ;
+            angleToEnemy = 1 ;
+        } else {
+            logRadar("..... enemy found OTHER time") ;
+            double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
+            double dx = distance*Math.sin(absAngle) ;
+            double dy = distance*Math.cos(absAngle) ;
+            double[] xAry = {dx,dy} ;
+            double[] xAry_prev = {dx_prev,dy_prev} ;
+            logRadar(xAry[0] + ", " + xAry[1]) ;
+            logRadar(xAry_prev[0] + ", " + xAry_prev[1]) ;
+            angleToEnemy = 1*scalar(xAry,xAry_prev) ;
+            logRadar(".... angle to enemy " + angleToEnemy) ;
+            
+            dx_prev = dx ;
+            dy_prev = dy ;
+
+        }
         //double x = getX() + dx ;
         //double y = getY() + dy ;
+        
+        
+        
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         logRadar("enemy relative angle " + e_bearing + ", absolute angle " + normalizeBearing((getHeadingInvariant() + e_bearing))) ;
         
@@ -301,7 +351,7 @@ public class Rambo extends AdvancedRobot {
 	 * onHitByBullet: What to do when you're hit by a bullet
 	 */
     public void onHitWall(HitWallEvent e) {
-        //this.moveDirection *= -1 ;
+        this.moveDirection *= -1 ;
     }
     
     private double gunToBody() {
@@ -323,7 +373,7 @@ public class Rambo extends AdvancedRobot {
     //TODO: nemelo by fungovat uplne vzdy, staci mimo ramec +-20 stupnu       
     private void setBodyToEnemy(double b,double distance) {
 //log("setBodyPerpendicularlyToBullet hold  = " + holdSettingToBullet) ;        
-        if (holdSettingBodyToBullet == false) {
+        if (setBodyToEnemyLock == false) {
         
             double angle = 0;
             double bfixed = 0;
@@ -361,7 +411,7 @@ public class Rambo extends AdvancedRobot {
                 setTurnLeft(angle) ;
             //}
         } else {
-            logMove("holding setting perp to bullet: " + holdSettingBodyToBullet) ;
+            logMove("holding setting perp to bullet: " + setBodyToEnemyLock) ;
         }
                
     }
