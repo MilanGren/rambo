@@ -92,7 +92,7 @@ public class Rambo extends AdvancedRobot {
     
     boolean tooCloseToWallLock = false ;
         
-    Map<Double, Double> map = new HashMap<>() ;
+
     
     Enemy enemy = new Enemy() ;
     
@@ -188,7 +188,7 @@ public class Rambo extends AdvancedRobot {
             double[] radar_direction = {Math.sin(getRadarHeadingRadians()),Math.cos(getRadarHeadingRadians())} ;
             double dire = angleDirection(enemy.direction(),radar_direction) ;
             logRadar(".... direction to enemy " + dire) ;
-            setTurnRadarRight(dire*60) ;
+            setTurnRadarRight(dire*70) ;
         }
         
         if (tooCloseToWallLock) {    
@@ -215,8 +215,8 @@ public class Rambo extends AdvancedRobot {
             
             
         } else {
-            setMaxVelocity(Rules.MAX_VELOCITY);
-            //setMaxVelocity(0) ;
+            //setMaxVelocity(Rules.MAX_VELOCITY);
+            setMaxVelocity(8) ;
             //logMove("doMove 2: not within wall boundary") ;
             //logMove("doMove 2: getheading " + getHeadingInvariant()) ;
             setBodyToEnemyLock = false ; //pokud jsem uniknul ...
@@ -275,11 +275,12 @@ public class Rambo extends AdvancedRobot {
     public void onScannedRobot(ScannedRobotEvent e) {
         double distance = e.getDistance() ;
 
-        double absAngle = getHeadingRadians() + e.getBearingRadians() ;        
+        double absAngle = getHeadingRadians() + e.getBearingRadians() ;    
+                        
         double dx = distance*Math.sin(absAngle) ;
         double dy = distance*Math.cos(absAngle) ;
         
-        enemy.set(dx,dy,absAngle) ;
+        enemy.set(getX() + dx,getY() + dy,dx,dy,absAngle,getTime()) ;
         
         enemyWasFoundFirstTime = true ;
 

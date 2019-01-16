@@ -5,36 +5,93 @@
  */
 package rambo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  * @author gre
  */
 public class Enemy {
     
+    public <T> void logEnemy(T t) {
+        //System.out.println(t) ;
+    }
+    
+    public <T> void logAI(T t) {
+        System.out.println(t) ;
+    }
+    
     private double distance, velocity, angle, t0, enemyHeading, alpha, additionalAngle ;
     
     private double dA, dB ;
     
-    private double dx, dy, absAngle ; // udelat gettery???
+    private double xC, yC, dx, dy, absAngle ; // udelat gettery???
     
-    public void set(double dx, double dy, double absAngle) {
+    Map<Double, Double[]> dXYmap = new HashMap<>() ;
+    
+    List<Double> dx_vec = new ArrayList<>() ;
+    List<Double> dy_vec = new ArrayList<>() ;
+    List<Double> xC_vec = new ArrayList<>() ;
+    List<Double> yC_vec = new ArrayList<>() ;
+    List<Integer> time_vec = new ArrayList<>() ;
+    List<Double> velocity_vec = new ArrayList<>() ;
+    
+    public void set(double xC, double yC,double dx, double dy, double absAngle,long time) {
+        
+        this.xC = xC ;
+        this.yC = yC ;
         this.dx = dx ;
         this.dy = dy ;
         this.absAngle = absAngle ;
+        dx_vec.add(dx) ;
+        dy_vec.add(dy) ;
+        xC_vec.add(xC) ;
+        yC_vec.add(yC) ;
+        time_vec.add((int) time) ;
+        
+        double dds ;
+        if (time_vec.size() == 1) {
+            dds = 0 ;
+            velocity_vec.add(3.0) ;
+            
+        } else {
+            dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
+            double dtime = time_vec.get(time_vec.size()-1) - time_vec.get(time_vec.size()-2) ; 
+            velocity_vec.add(dds/dtime) ;
+            logAI("AI " + dx_vec.size()) ;
+            logAI("AI " + time_vec.size()) ;
+            logAI("AI " + velocity_vec.size()) ;
+            logAI("AI listing time vec ") ;
+            int index = 0 ;
+            for (int t: time_vec) {
+                //change of distance per unit time
+                logAI("AI enemy " + t + " dx " + xC_vec.get(index) + " dy " + xC_vec.get(index) + " velocity " + velocity_vec.get(index)) ;
+                index++ ;
+            }
+        }
     }
     
     public void setForFire(double distance, double velocity, double angle, double enemyHeading, double t0) {
         this.distance = distance ;
         this.velocity = velocity ;
-        this.angle = angle ;     //absolute 
+        this.angle = angle ;     //absolute - odklon nepritele od Y souradnice
         this.t0 = t0 ;
         this.enemyHeading = enemyHeading ;
-        this.alpha =  this.angle - this.enemyHeading ;
+        this.alpha =  this.angle - this.enemyHeading ; // uhel, pod kterym nepritel unika v ramci spojnice ja-nepritel
         logEnemy("enemy velocity " + velocity) ;
         logEnemy("enemy angle " + normalizeBearing(angle)) ;
         logEnemy("enemy alpha " + normalizeBearing(alpha)) ;
         logEnemy("enemy heading " + enemyHeading) ;
         logEnemy("enemy heading relative to alpha " + normalizeBearing(alpha) ) ;
+    }
+    
+    public void getDistancePrediction() {
+        
+        
+        
     }
     
     public double[] direction() {
@@ -46,9 +103,7 @@ public class Enemy {
         return this.additionalAngle ;
     }
     
-    public <T> void logEnemy(T t) {
-        //System.out.println(t) ;
-    }
+ 
     
     double toRad(double x) {
         return x*Math.PI/180 ; 
@@ -75,7 +130,16 @@ public class Enemy {
             
     
     void fin(double bulletVelocity) {
-        Solver solver = new Solver(this.distance, this.velocity, this.alpha, 0, 0, bulletVelocity) ;
+        
+        double vv =  this.velocity_vec.get(velocity_vec.size()-1) ;
+        
+        
+        
+        double v = this.velocity ;
+        logAI("AI " + v) ;
+        logAI("AI " + vv) ;
+        
+        Solver solver = new Solver(this.distance,vv, this.alpha, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;

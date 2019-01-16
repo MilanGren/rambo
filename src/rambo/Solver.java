@@ -57,10 +57,13 @@ public class Solver {
         
         log("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double ds = dt*this.velocity ; 
+        double ds = dt*this.velocity ; //kolik nepritel ujede za cas dt
 
-// rychlost 
         
+// this.velocity nahradit nejakou stredni hodnotou pres budoucnost
+// this.velocity * <velocity>
+// 
+
         //log("  enemy: dt " + dt + " ds " + ds + " alpha deg,rad " + alpha + " , " + toRad(alpha)) ;
         log("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
         dA = Math.cos(toRad(alpha))*ds ; 
