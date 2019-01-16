@@ -50,20 +50,27 @@ public class Solver {
     
     public synchronized void solve() {
 
+        // vzdycky se aktualizuje uhel a tim i vzdalenost
+        // 
+        
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
         log("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double ds = dt*this.velocity ;
+        double ds = dt*this.velocity ; 
+
+// rychlost 
+        
         //log("  enemy: dt " + dt + " ds " + ds + " alpha deg,rad " + alpha + " , " + toRad(alpha)) ;
         log("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
-        dA = Math.cos(toRad(alpha))*ds ;
+        dA = Math.cos(toRad(alpha))*ds ; 
         dB = Math.sin(toRad(alpha))*ds ;
         log("  => dA " + dA) ;
         log("  => dB " + dB) ;
-        double projection = this.distanceOriginal + dA ;
+        double projection = this.distanceOriginal + dA ; 
+        
         this.additionalAngle = toDeg(-Math.atan(dB/projection)) ;
-        double xx = toDeg(-Math.atan(dB/projection)) ;
+        
         
         log("  dB " + dB + "  projection " + (projection)) ;
         log("  dB/projection " + (dB/projection)) ;

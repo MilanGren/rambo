@@ -15,8 +15,15 @@ public class Enemy {
     
     private double dA, dB ;
     
+    private double dx, dy, absAngle ; // udelat gettery???
     
-    public void set(double distance, double velocity, double angle, double enemyHeading, double t0) {
+    public void set(double dx, double dy, double absAngle) {
+        this.dx = dx ;
+        this.dy = dy ;
+        this.absAngle = absAngle ;
+    }
+    
+    public void setForFire(double distance, double velocity, double angle, double enemyHeading, double t0) {
         this.distance = distance ;
         this.velocity = velocity ;
         this.angle = angle ;     //absolute 
@@ -28,6 +35,11 @@ public class Enemy {
         logEnemy("enemy alpha " + normalizeBearing(alpha)) ;
         logEnemy("enemy heading " + enemyHeading) ;
         logEnemy("enemy heading relative to alpha " + normalizeBearing(alpha) ) ;
+    }
+    
+    public double[] direction() {
+        double[] vec = {dx,dy} ;
+        return vec ;
     }
     
     public double getAdditionalAngle() {
