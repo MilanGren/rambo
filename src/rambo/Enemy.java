@@ -130,16 +130,7 @@ public class Enemy {
             
     
     void fin(double bulletVelocity) {
-        
-        double vv =  this.velocity_vec.get(velocity_vec.size()-1) ;
-        
-        
-        
-        double v = this.velocity ;
-        logAI("AI " + v) ;
-        logAI("AI " + vv) ;
-        
-        Solver solver = new Solver(this.distance,vv, this.alpha, 0, 0, bulletVelocity) ;
+        Solver solver = new Solver(this.distance,this.velocity,this.velocity_vec, this.alpha, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;

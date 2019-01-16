@@ -188,7 +188,7 @@ public class Rambo extends AdvancedRobot {
             double[] radar_direction = {Math.sin(getRadarHeadingRadians()),Math.cos(getRadarHeadingRadians())} ;
             double dire = angleDirection(enemy.direction(),radar_direction) ;
             logRadar(".... direction to enemy " + dire) ;
-            setTurnRadarRight(dire*70) ;
+            setTurnRadarRight(dire*45) ;
         }
         
         if (tooCloseToWallLock) {    
@@ -231,6 +231,7 @@ public class Rambo extends AdvancedRobot {
         double moveGunBy = angle - gunToBody() ;
         logFire("  moveGunBy " + moveGunBy) ;
         setTurnGunRight(normalizeBearing(moveGunBy)) ;
+        //turnGunRight(normalizeBearing(moveGunBy)) ;
         
     }
     
@@ -256,13 +257,16 @@ public class Rambo extends AdvancedRobot {
         //setBodyPerpendicularlyToBullet(e.getBearing()) ;
         
         setGun(e_bearing + enemy.getAdditionalAngle()) ;
+        logFire("setGun " + (e_bearing + enemy.getAdditionalAngle()) ) ;
         logFire("getGunTurnRemaining " + getGunTurnRemaining()) ;
         
         //logFire("getGunHeat " + getGunHeat()) ;
-        if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 2) {
+        if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 3) {
+        //if (getGunHeat() <= 0)   {
             double energy = getEnergy() ;
             logFire("fire!") ;
             setFire(firepower) ;
+            //fire(firepower) ;
             double gh = 1+firepower/5 ;
         } else {
         //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
@@ -282,7 +286,7 @@ public class Rambo extends AdvancedRobot {
         
         enemy.set(getX() + dx,getY() + dy,dx,dy,absAngle,getTime()) ;
         
-        enemyWasFoundFirstTime = true ;
+        //enemyWasFoundFirstTime = true ;
 
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         logRadar("onScanned: enemy relative angle " + e_bearing + ", absolute angle " + normalizeBearing(toDeg(absAngle))) ; // stejne jako normalizeBearing((getHeadingInvariant() + e_bearing))

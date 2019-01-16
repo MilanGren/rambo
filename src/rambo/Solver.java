@@ -5,6 +5,8 @@
  */
 package rambo;
 
+import java.util.List;
+
 /**
  *
  * @author gre
@@ -12,14 +14,16 @@ package rambo;
 public class Solver {
     
     public double distanceOriginal, distanceActual, velocity, alpha, dA, dB, bulletVelocity, additionalAngle ;
+    public List<Double> velocity_vec ;
     
     int i = 0 ;
     
     
-    public Solver(double distance, double velocity, double alpha, double dA, double dB, double bulletVelocity) {
+    public Solver(double distance, double velocity, List<Double> velocity_vec, double alpha, double dA, double dB, double bulletVelocity) {
         
         this.distanceOriginal = distance ;
         this.distanceActual = distance ;
+        this.velocity_vec = velocity_vec ;
         this.velocity = velocity ;
         this.alpha = alpha ;
         this.dA = dA ;
@@ -57,7 +61,9 @@ public class Solver {
         
         log("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double ds = dt*this.velocity ; //kolik nepritel ujede za cas dt
+        double ds = dt*velocity ;//this.velocity_vec.get(velocity_vec.size()-1) ; //kolik nepritel ujede za cas dt
+        
+        
 
         
 // this.velocity nahradit nejakou stredni hodnotou pres budoucnost
