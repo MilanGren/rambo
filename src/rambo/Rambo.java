@@ -22,6 +22,23 @@ import java.util.Map;
 
 public class Rambo extends AdvancedRobot {
     
+        
+    public <T> void logMove(T t) {
+        System.out.println(getTime() + " Move " + t) ;
+    }
+    
+    public <T> void logFire(T t) {
+    //    System.out.println(t) ;
+    }
+    
+    public <T> void logRadar(T t) {
+    //    System.out.println(getTime() + " Radar " + t) ;
+    }
+    
+    public <T> void log(T t) {
+    //    System.out.println(t) ;
+    }
+    
     public double scalar(double[] a,double[] b) {
         double sizeA = Math.pow((Math.pow(a[0],2) + Math.pow(a[1],2)),0.5) ;
         double sizeB = Math.pow((Math.pow(b[0],2) + Math.pow(b[1],2)),0.5) ;
@@ -60,27 +77,8 @@ public class Rambo extends AdvancedRobot {
         return x*180/Math.PI ;
     }
     
-    public <T> void logMove(T t) {
-        System.out.println(getTime() + " Move " + t) ;
-    }
-    
-    public <T> void logFire(T t) {
-    //    System.out.println(t) ;
-    }
-    
-    public <T> void logRadar(T t) {
-        System.out.println(getTime() + " Radar " + t) ;
-    }
-    
-    public <T> void log(T t) {
-        System.out.println(t) ;
-    }
-    
-    private static final double WALLMARGIN = 160 ; //150
-    private static final double FIRSTRINGRADIUS = 300 ;
-    private static final double SECONDRINGRADIUS = 500 ;
-    //private static final double FIXINGDBR = 40 ;
-    
+
+       
 
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
   
@@ -93,12 +91,11 @@ public class Rambo extends AdvancedRobot {
     int moveDirection = -1 ;
     
     boolean tooCloseToWallLock = false ;
-        
-    List<Double> xC_vec = new ArrayList<>() ;
-    List<Double> yC_vec = new ArrayList<>() ;
+       
     
-    Enemy enemy = new Enemy() ;
+    Enemy enemy = new Enemy(false) ;
     
+    AI ai = new AI(true) ;
     
     /////////////////////////////////////////////////////
     /////////////////////////////////////////////////////
@@ -109,17 +106,17 @@ public class Rambo extends AdvancedRobot {
             public boolean test() {
                 boolean bol ;
                 String fromWhichSide = "" ;
-                if (getX() <= WALLMARGIN) {
+                if (getX() <= ai.WALLMARGIN) {
                     fromWhichSide = "left" ;
                     wallSurfaceAngle = 90 ;
-                } else if (getX() >= getBattleFieldWidth() - WALLMARGIN) {
+                } else if (getX() >= getBattleFieldWidth() - ai.WALLMARGIN) {
                     bol = true ;
                     fromWhichSide = "right" ;
                     wallSurfaceAngle = -90 ;
-                } else if (getY() <= WALLMARGIN) {
+                } else if (getY() <= ai.WALLMARGIN) {
                     wallSurfaceAngle = 0 ;
                     fromWhichSide = "bottom" ;
-                } else if (getY() >= getBattleFieldHeight() - WALLMARGIN) {
+                } else if (getY() >= getBattleFieldHeight() - ai.WALLMARGIN) {
                     wallSurfaceAngle = 180 ;
                     fromWhichSide = "top" ;
                 }
@@ -130,13 +127,13 @@ public class Rambo extends AdvancedRobot {
                 
 		return (
                     // we're too close to the left wall
-                    (getX() <= WALLMARGIN ||
+                    (getX() <= ai.WALLMARGIN ||
                     // or we're too close to the right wall
-                    getX() >= getBattleFieldWidth() - WALLMARGIN ||
+                    getX() >= getBattleFieldWidth() - ai.WALLMARGIN ||
                     // or we're too close to the bottom wall
-                    getY() <= WALLMARGIN ||
+                    getY() <= ai.WALLMARGIN ||
                     // or we're too close to the top wall
-                    getY() >= getBattleFieldHeight() - WALLMARGIN)
+                    getY() >= getBattleFieldHeight() - ai.WALLMARGIN)
 		);
             }
 	}) ;
@@ -149,12 +146,21 @@ public class Rambo extends AdvancedRobot {
         
         boolean stop = false ;
         int round = 0 ;
+        
         while(true) {
+            
+            ai.xVec.add(getX()) ;
+            ai.yVec.add(getY()) ;
+            ai.dtime += 1 ; // OPRAVDU FUNGUJE? MELO BY DIKY SEETERUM VSUDE
+            
             log("---------- BOC " + round + " getTime" + getTime()) ;
             doMove(); 
             log("---------- EOC " + round + " getTime" + getTime() + "\n") ;
             round++ ;
             execute() ;
+ 
+  
+            
         }
         
     }
@@ -179,39 +185,28 @@ public class Rambo extends AdvancedRobot {
     }
     
     
-    public double myDistance() {
-        
-        double tot = 0;
-        for(int i=0; i<xC_vec.size()-1; i++){
-            if (i == 0) {
-                tot += 0 ;
-            } else {
-                tot += Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
-            }
-            
-        }
-        
-        return tot ;
-        
-    }
-    
     private void doMove() {
         
         setAhead(1000*moveDirection) ;
         
-        xC_vec.add(getX()) ;
-        yC_vec.add(getY()) ;
+       //logMove("ai.getTotalDistance() " + ai.getTotalDistance()) ;
         
-        logMove("total distance " + myDistance()) ;
+        /*
         
-        if (myDistance() > 200) {
-            xC_vec.clear() ;
-            yC_vec.clear() ;
-            //moveDirection *= -1 ;
+        if (ai.getTotalDistance() > 200) {
+            ai.xVec.clear() ;
+            ai.yVec.clear() ;
+            //
         }
-        
-        
-        //setTurnRadarRight(360) ;
+
+*/
+
+        if (ai.dtime + 3 > ai.getAveHitDt()+25) {
+            logMove("CHANGE TANK DIRECTION: ai.dtime " + ai.dtime + " ai.getAveHitDt() " + ai.getAveHitDt()) ;
+            moveDirection *= -1 ;
+            ai.dtime = 0 ;
+        }
+
         
         if (!enemyWasFoundFirstTime) { //da se toho zbavit?
             setTurnRadarRight(90) ;
@@ -296,7 +291,7 @@ public class Rambo extends AdvancedRobot {
         logFire("getGunTurnRemaining " + getGunTurnRemaining()) ;
         
         //logFire("getGunHeat " + getGunHeat()) ;
-        if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 3) {
+        if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 3 && ai.allowFire) {
         //if (getGunHeat() <= 0)   {
             double energy = getEnergy() ;
             logFire("fire!") ;
@@ -326,8 +321,8 @@ public class Rambo extends AdvancedRobot {
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         logRadar("onScanned: enemy relative angle " + e_bearing + ", absolute angle " + normalizeBearing(toDeg(absAngle))) ; // stejne jako normalizeBearing((getHeadingInvariant() + e_bearing))
         
-        if (distance < FIRSTRINGRADIUS && !firstRingReached) {
-            logRadar("onScanned 1: reached " + FIRSTRINGRADIUS) ;
+        if (distance < ai.FIRSTRINGRADIUS && !firstRingReached) {
+            logRadar("onScanned 1: reached " + ai.FIRSTRINGRADIUS) ;
             logRadar("onScanned 1: setting body by " + e_bearing) ;
             approachingEnemy = false ;
             setBodyToEnemy(e_bearing,distance,25) ;
@@ -336,8 +331,8 @@ public class Rambo extends AdvancedRobot {
             //moveDirection *= -1 ;
         }
         
-        else if (distance < SECONDRINGRADIUS && firstRingReached) { // pokracuj v prvnim bode, dokud distance < secondRingRadiu
-            logRadar("onScanned 2: withing distance " + SECONDRINGRADIUS) ;
+        else if (distance < ai.SECONDRINGRADIUS && firstRingReached) { // pokracuj v prvnim bode, dokud distance < secondRingRadiu
+            logRadar("onScanned 2: withing distance " + ai.SECONDRINGRADIUS) ;
             logRadar("onScanned 2: setting body by " + e_bearing) ;
             approachingEnemy = false ;
             setBodyToEnemy(e_bearing,distance,25) ;
@@ -349,8 +344,10 @@ public class Rambo extends AdvancedRobot {
             firstRingReached = false ;
             approachingEnemy = true ;
             //setTurnRight( e_bearing ) ; 
-            setBodyToEnemy(e_bearing,distance,35) ;
+            setBodyToEnemy(e_bearing,distance,0) ;//35) ;
             setWhenClose(e) ; 
+            
+            ai.allowFire = false ;
             
             //TODO - strileni by melo byt vypnuto
 
@@ -372,18 +369,18 @@ public class Rambo extends AdvancedRobot {
             
             logMove("setting body to enemy") ;
             
-            logMove("  " + distance + " / " + FIRSTRINGRADIUS) ;
+            logMove("  " + distance + " / " + ai.FIRSTRINGRADIUS) ;
             
-            if (distance < FIRSTRINGRADIUS && b>= 0) { //chci se oddalit
+            if (distance < ai.FIRSTRINGRADIUS && b>= 0) { //chci se oddalit
                     fixingdb = fixingDBabs ; //kladny uhel doleva
                     logMove("doMove:   1 get away") ;
-            } else if (distance > FIRSTRINGRADIUS && b>= 0) { //chci se priblizit
+            } else if (distance > ai.FIRSTRINGRADIUS && b>= 0) { //chci se priblizit
                     fixingdb = -fixingDBabs ; //zaporny uhel doleva
                     logMove("doMove:  2 get closer") ;
-            } else if (distance < FIRSTRINGRADIUS && b < 0) { //chci se oddalit
+            } else if (distance < ai.FIRSTRINGRADIUS && b < 0) { //chci se oddalit
                     fixingdb = -fixingDBabs ; // 
                     logMove("doMove:  3 get away") ;
-            } else if (distance > FIRSTRINGRADIUS && b < 0) {
+            } else if (distance > ai.FIRSTRINGRADIUS && b < 0) {
                     fixingdb = fixingDBabs ; // 
                     logMove("doMove:  4 get closer") ;
             }
@@ -432,16 +429,10 @@ public class Rambo extends AdvancedRobot {
     }
     
     
-    public void onHitByBullet(HitByBulletEvent e) {        
-        if (!approachingEnemy) {
-            moveDirection *= -1 ;
-        } else {
-            //moveDirection *= -1 ;
-        }
-
+    public void onHitByBullet(HitByBulletEvent e) {     
+        ai.hitVec.add((int) getTime()) ;
     }
     
-    // 
     private double getAngleInvariant(double angle) { 
         double out ;
         if (moveDirection == -1) {
@@ -452,14 +443,11 @@ public class Rambo extends AdvancedRobot {
         return out ;
     }
     
-    
     private double gunToBody() {
         double angle = getGunHeading() - getHeadingInvariant() ;
         return normalizeBearing(angle) ;
     }
-	/**
-	 * onHitByBullet: What to do when you're hit by a bullet
-	 */
+
     public void onHitWall(HitWallEvent e) {
         this.moveDirection *= -1 ;
     }

@@ -16,12 +16,15 @@ import java.util.Map;
  */
 public class Enemy {
     
-    public <T> void logEnemy(T t) {
-        //System.out.println(t) ;
+    boolean useLog = true ;
+    public Enemy(boolean useLog) {
+        this.useLog = useLog ;
     }
     
-    public <T> void logAI(T t) {
-        System.out.println(t) ;
+    public <T> void logEnemy(T t) {
+        if (useLog) {
+            System.out.println("Enemy" + t) ;
+        }
     }
     
     private double distance, velocity, angle, t0, enemyHeading, alpha, additionalAngle ;
@@ -61,10 +64,10 @@ public class Enemy {
             dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
             double dtime = time_vec.get(time_vec.size()-1) - time_vec.get(time_vec.size()-2) ; 
             velocity_vec.add(dds/dtime) ;
-            logAI("AI " + dx_vec.size()) ;
-            logAI("AI " + time_vec.size()) ;
-            logAI("AI " + velocity_vec.size()) ;
-            logAI("AI listing time vec ") ;
+            logEnemy(" AI " + dx_vec.size()) ;
+            logEnemy(" AI " + time_vec.size()) ;
+            logEnemy(" AI " + velocity_vec.size()) ;
+            logEnemy(" AI listing time vec ") ;
             int index = 0 ;
             for (int t: time_vec) {
                 //change of distance per unit time
