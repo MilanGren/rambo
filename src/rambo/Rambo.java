@@ -350,7 +350,9 @@ public class Rambo extends AdvancedRobot {
             approachingEnemy = true ;
             //setTurnRight( e_bearing ) ; 
             setBodyToEnemy(e_bearing,distance,35) ;
-            setWhenClose(e) ;
+            setWhenClose(e) ; 
+            
+            //TODO - strileni by melo byt vypnuto
 
             logRadar("onScanned 3: is too far     distance = " + distance) ;
            
