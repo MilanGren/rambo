@@ -68,7 +68,7 @@ public class Enemy {
             int index = 0 ;
             for (int t: time_vec) {
                 //change of distance per unit time
-                logAI("AI enemy " + t + " dx " + xC_vec.get(index) + " dy " + xC_vec.get(index) + " velocity " + velocity_vec.get(index)) ;
+                //logAI("AI enemy " + t + " dx " + xC_vec.get(index) + " dy " + xC_vec.get(index) + " velocity " + velocity_vec.get(index)) ;
                 index++ ;
             }
         }
@@ -87,12 +87,7 @@ public class Enemy {
         logEnemy("enemy heading " + enemyHeading) ;
         logEnemy("enemy heading relative to alpha " + normalizeBearing(alpha) ) ;
     }
-    
-    public void getDistancePrediction() {
-        
-        
-        
-    }
+   
     
     public double[] direction() {
         double[] vec = {dx,dy} ;
