@@ -62,7 +62,8 @@ public class Rambo extends AdvancedRobot {
     int moveDirection = -1 ;
     
     boolean tooCloseToWallLock = false ;
-       
+    
+    List<Integer> hitsReceived = new ArrayList<>() ;
     
     Enemy enemy = new Enemy(true) ;
     
@@ -215,7 +216,7 @@ public class Rambo extends AdvancedRobot {
             
         } else {
             //setMaxVelocity(Rules.MAX_VELOCITY);
-            setMaxVelocity(8) ;
+            setMaxVelocity(0) ;
             //logMove("doMove 2: not within wall boundary") ;
             //logMove("doMove 2: getheading " + getHeadingInvariant()) ;
             setBodyToEnemyLock = false ; //pokud jsem uniknul ...
@@ -401,6 +402,9 @@ public class Rambo extends AdvancedRobot {
     }
     
     private double getAngleInvariant(double angle) { 
+        
+        hitsReceived.add(1) ;
+        
         double out ;
         if (moveDirection == -1) {
             out = normalizeBearing(angle + 180) ;

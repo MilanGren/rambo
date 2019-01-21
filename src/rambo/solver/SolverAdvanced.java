@@ -8,11 +8,15 @@ import rambo.Utils;
 public class SolverAdvanced extends SolverAbstract {
     
     public List<Double> accelVec ;
+    public List<Integer> accelDirVec ;
     
-    public SolverAdvanced(double distance, double velocity, List<Double> velVec, List<Double> accelVec, double alpha, double dA, double dB, double bulletVelocity) {
+    public SolverAdvanced(double distance, double velocity, List<Double> velVec, List<Double> accelVec, List<Integer> accelDir, double alpha, double dA, double dB, double bulletVelocity) {
         super(distance, velocity, velVec, alpha, dA, dB, bulletVelocity);
         this.accelVec = accelVec ;
+        this.accelDirVec = accelDir ;
     }
+    
+    
     
     @Override
     public void solve() {
@@ -25,7 +29,7 @@ public class SolverAdvanced extends SolverAbstract {
         
         double v0 = velVec.get(velVec.size()-1) ; //zde je rozdil oprovi v0 v Enemy - zde predikuji
         double accel = accelVec.get(accelVec.size()-1) ;
-        
+        int accelDir = accelDirVec.get(accelDirVec.size()-1) ;
         
         
         double vMax = 8 ;
@@ -34,41 +38,43 @@ public class SolverAdvanced extends SolverAbstract {
         double dtM ;
         double ds ;
         
-        if (Math.abs(accel) < 0.00001) {
-            logSolver(" no speed change");
-        } else if (accel*v0 < 0) {
-            logSolver(" sloving down");
-        } else {
-            logSolver(" accelerating");
-        }
         
-        if (Math.abs(accel) < 0.00001) {
+        
+        if (accelDir == 0) {
             logSolver("0 accel " + accel) ;
             dtM = 0 ;
             ds = v0*dt ;
-        } else if (accel <= 0) {
-            logSolver("1 accel " + accel) ;
-            dtM = (v0 - vMin)/accel ;
+        } else if (accelDir < 0) { // potom predpokladam zpomalovani
+            logSolver("1 sloving down " + accel) ;
+            dtM = (Math.abs(v0) - vMin)/Math.abs(accel) ;
+            logSolver("dtM " + Utils.round(dtM,1)) ;
             if (dt <= dtM) {
                 ds = 0.5*accel*dt*dt + v0*dt ; 
+                logSolver("ds only a " + ds) ;
             } else {
                 ds = 0.5*accel*dtM*dtM + v0*dtM ;
+                logSolver("ds a " + ds) ;
                 ds += vMin*(dt-dtM) ;
+                logSolver("ds tot " + ds) ;
             }   
-        } else { 
-            logSolver("2 accel " + accel) ;
-            dtM = (vMax - v0)/accel ;
+        } else { // zrychlovani
+            logSolver("2 accelerating " + accel) ;
+            dtM = (vMax - Math.abs(v0))/Math.abs(accel) ;
+            logSolver("dtM " + Utils.round(dtM,1)) ;
             if (dt <= dtM) {
                 ds = 0.5*accel*dt*dt + v0*dt ; 
+                logSolver("ds only a " + ds) ;
             } else {
                 ds = 0.5*accel*dtM*dtM + v0*dtM ;
-                ds += vMin*(dt-dtM) ;
+                logSolver("ds a " + ds) ;
+                ds += vMax*(dt-dtM) ;
+                logSolver("ds tot " + ds) ;
             }
         }
         
         logSolver("dtM " + dtM) ;
-        logSolver("dt " + dt + " a " + Utils.round(accel,2) + " ds " + Utils.round(ds,1) + " dsOld " + Utils.round(dsOld,1)) ;
-        logSolver("velocity " + velocity + " velVec last" + velVec.get(velVec.size()-1)) ;
+        logSolver("dt " + Utils.round(dt,1) + " a " + Utils.round(accel,2) + " ds " + Utils.round(ds,1) + " dsOld " + Utils.round(dsOld,1)) ;
+        logSolver("velocity " + velocity + " velVec last" + Utils.round(velVec.get(velVec.size()-1),2)) ;
         
         
 // this.velocity nahradit nejakou stredni hodnotou pres budoucnost
