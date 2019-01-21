@@ -103,6 +103,8 @@ public class Enemy {
             }
             
             
+           
+            
             if ( Math.abs(eneVec.get(eneVec.size()-1)-eneVec.get(eneVec.size()-2) ) > 1) {
                 wasFired.add(true) ;
             } else {

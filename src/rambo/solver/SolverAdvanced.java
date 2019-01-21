@@ -62,7 +62,7 @@ public class SolverAdvanced extends SolverAbstract {
             } else {
                 ds = 0.5*accel*dtM*dtM + v0*dtM ;
                 logSolver("ds a " + ds) ;
-                ds += vMax*(dt-dtM) ;
+                ds += vMax*(dt-dtM)*Math.abs(enemy.velocity)/enemy.velocity ;
                 logSolver("ds tot " + ds) ;
             }
         }
