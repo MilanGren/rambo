@@ -26,27 +26,48 @@ public class SolverAdvanced extends SolverAbstract {
         double v0 = velVec.get(velVec.size()-1) ; //zde je rozdil oprovi v0 v Enemy - zde predikuji
         double accel = accelVec.get(accelVec.size()-1) ;
         
-         
+        
+        
         double vMax = 8 ;
-        double dtMax = (vMax - v0)/accel ;
+        double vMin = 0 ;
         
-        
+        double dtM ;
         double ds ;
-        if (dt <= dtMax) {
-            ds = 0.5*accel*dt*dt + v0*dt ;
+        
+        if (Math.abs(accel) < 0.00001) {
+            logSolver(" no speed change");
+        } else if (accel*v0 < 0) {
+            logSolver(" sloving down");
         } else {
-            ds = 0.5*accel*dtMax*dtMax + v0*dtMax ;
-            ds += vMax*(dt-dtMax) ;
+            logSolver(" accelerating");
         }
         
+        if (Math.abs(accel) < 0.00001) {
+            logSolver("0 accel " + accel) ;
+            dtM = 0 ;
+            ds = v0*dt ;
+        } else if (accel <= 0) {
+            logSolver("1 accel " + accel) ;
+            dtM = (v0 - vMin)/accel ;
+            if (dt <= dtM) {
+                ds = 0.5*accel*dt*dt + v0*dt ; 
+            } else {
+                ds = 0.5*accel*dtM*dtM + v0*dtM ;
+                ds += vMin*(dt-dtM) ;
+            }   
+        } else { 
+            logSolver("2 accel " + accel) ;
+            dtM = (vMax - v0)/accel ;
+            if (dt <= dtM) {
+                ds = 0.5*accel*dt*dt + v0*dt ; 
+            } else {
+                ds = 0.5*accel*dtM*dtM + v0*dtM ;
+                ds += vMin*(dt-dtM) ;
+            }
+        }
         
-        
-        
-        
-        
-        
-
-        logSolver("dt " + dt + " a " + accel + " ds " + ds + " dsOld " + dsOld) ;
+        logSolver("dtM " + dtM) ;
+        logSolver("dt " + dt + " a " + Utils.round(accel,2) + " ds " + Utils.round(ds,1) + " dsOld " + Utils.round(dsOld,1)) ;
         logSolver("velocity " + velocity + " velVec last" + velVec.get(velVec.size()-1)) ;
         
         

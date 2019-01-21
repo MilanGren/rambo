@@ -240,7 +240,7 @@ public class Rambo extends AdvancedRobot {
   
         double e_bearing = getAngleInvariant(e.getBearing()) ;
         
-        enemy.setForFire(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading(),getTime()) ;
+        enemy.setForFire(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading()) ;
 
         double firepower = 1 ;
  

@@ -32,7 +32,7 @@ public class Enemy {
         }
     }
     
-    private double distance, velocity, angle, t0, enemyHeading, alpha, additionalAngle ;
+    private double distance, velocity, angle, enemyHeading, alpha, additionalAngle ;
     
     private double dA, dB ;
     
@@ -70,7 +70,6 @@ public class Enemy {
         if (time_vec.size() == 1) {
             velVec.add(0.0) ;
             velAveVec.add(0.0) ;
-            eneVec.add(100.0) ;
             accelVec.add(0.0) ;
             wasFired.add(false) ;
             
@@ -98,10 +97,10 @@ public class Enemy {
             }
             
             logEnemy("AI enemy listing") ;
-            int index = 0 ;
+            int index = 0 ; 
             for (int t: time_vec) {
  
-                logEnemy("AI enemy " + t 
+                logEnemy(" time " + t 
                          + " dx " + Utils.round(xC_vec.get(index),1) 
                          + " dy " + Utils.round(yC_vec.get(index),1)
                          + " vel " + Utils.round(velVec.get(index),2)
@@ -114,11 +113,10 @@ public class Enemy {
         }
     }
     
-    public void setForFire(double distance, double velocity, double angle, double enemyHeading, double t0) {
+    public void setForFire(double distance, double velocity, double angle, double enemyHeading) {
         this.distance = distance ;
         this.velocity = velocity ;
         this.angle = angle ;     //absolute - odklon nepritele od Y souradnice
-        this.t0 = t0 ;
         this.enemyHeading = enemyHeading ;
         this.alpha =  this.angle - this.enemyHeading ; // uhel, pod kterym nepritel unika v ramci spojnice ja-nepritel
         logEnemy("velocity " + velocity) ;
@@ -154,7 +152,8 @@ public class Enemy {
     
 
     public void fin(double bulletVelocity) {
-        SolverAbstract solver = new SolverAdvanced(this.distance,this.velocity,this.velVec, this.accelVec, this.alpha, 0, 0, bulletVelocity) ;
+        SolverAbstract solver = new SolverAdvanced (this.distance,this.velocity,this.velVec, this.accelVec, this.alpha, 0, 0, bulletVelocity) ;
+        //SolverAbstract solver = new SolverBasic (this.distance,this.velocity,this.velVec, this.accelVec, this.alpha, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
