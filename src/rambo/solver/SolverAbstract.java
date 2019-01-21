@@ -6,6 +6,7 @@
 package rambo.solver;
 
 import java.util.List;
+import rambo.Enemy;
 
 /**
  *
@@ -13,23 +14,22 @@ import java.util.List;
  */
 public abstract class SolverAbstract {
     
-    public double distanceOriginal, distanceActual, velocity, alpha, dA, dB, bulletVelocity, additionalAngle ;
-    public List<Double> velVec ;
+    public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle ;
+
+    
+    Enemy enemy ;
     
     int i = 0 ;
     
     
-    public SolverAbstract(double distance, double velocity, List<Double> velVec, double alpha, double dA, double dB, double bulletVelocity) {
-        
-        this.distanceOriginal = distance ;
-        this.distanceActual = distance ;
-        this.velVec = velVec ;
-        this.velocity = velocity ;
-        this.alpha = alpha ;
+    //public SolverAbstract(double distance, double velocity, List<Double> velVec, double alpha, double dA, double dB, double bulletVelocity) {
+    public SolverAbstract(Enemy enemy, double dA, double dB, double bulletVelocity) {    
+        this.enemy = enemy ;
+        this.distanceOriginal = enemy.distance ;
+        this.distanceActual = enemy.distance ;
         this.dA = dA ;
         this.dB = dB ;
         this.bulletVelocity = bulletVelocity ;
-
     }
     
     protected <T> void logSolver(T t) {

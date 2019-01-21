@@ -2,21 +2,16 @@
 package rambo.solver;
 
 import java.util.List;
+import rambo.Enemy;
 import rambo.Utils;
 
 
 public class SolverAdvanced extends SolverAbstract {
-    
-    public List<Double> accelVec ;
-    public List<Integer> accelDirVec ;
-    
-    public SolverAdvanced(double distance, double velocity, List<Double> velVec, List<Double> accelVec, List<Integer> accelDir, double alpha, double dA, double dB, double bulletVelocity) {
-        super(distance, velocity, velVec, alpha, dA, dB, bulletVelocity);
-        this.accelVec = accelVec ;
-        this.accelDirVec = accelDir ;
+
+    public SolverAdvanced(Enemy enemy, double dA, double dB, double bulletVelocity) {
+        super(enemy, dA, dB, bulletVelocity);
     }
-    
-    
+
     
     @Override
     public void solve() {
@@ -24,12 +19,12 @@ public class SolverAdvanced extends SolverAbstract {
         
         logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double dsOld = dt*velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
+        double dsOld = dt*enemy.velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
       
         
-        double v0 = velVec.get(velVec.size()-1) ; //zde je rozdil oprovi v0 v Enemy - zde predikuji
-        double accel = accelVec.get(accelVec.size()-1) ;
-        int accelDir = accelDirVec.get(accelDirVec.size()-1) ;
+        double v0 = enemy.velVec.get(enemy.velVec.size()-1) ; //zde je rozdil oprovi v0 v Enemy - zde predikuji
+        double accel = enemy.accelVec.get(enemy.accelVec.size()-1) ;
+        int accelDir = enemy.accelDirVec.get(enemy.accelDirVec.size()-1) ;
         
         
         double vMax = 8 ;
@@ -74,7 +69,7 @@ public class SolverAdvanced extends SolverAbstract {
         
         logSolver("dtM " + dtM) ;
         logSolver("dt " + Utils.round(dt,1) + " a " + Utils.round(accel,2) + " ds " + Utils.round(ds,1) + " dsOld " + Utils.round(dsOld,1)) ;
-        logSolver("velocity " + velocity + " velVec last" + Utils.round(velVec.get(velVec.size()-1),2)) ;
+        logSolver("velocity " + enemy.velocity + " velVec last" + Utils.round(enemy.velVec.get(enemy.velVec.size()-1),2)) ;
         
         
 // this.velocity nahradit nejakou stredni hodnotou pres budoucnost
@@ -82,9 +77,9 @@ public class SolverAdvanced extends SolverAbstract {
 // 
 
         //log("  enemy: dt " + dt + " ds " + ds + " alpha deg,rad " + alpha + " , " + toRad(alpha)) ;
-        logSolver("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
-        dA = Math.cos(Utils.toRad(alpha))*ds ; 
-        dB = Math.sin(Utils.toRad(alpha))*ds ;
+        logSolver("                                                   " + enemy.alpha + ", " + ds + ", " + distanceActual) ;
+        dA = Math.cos(Utils.toRad(enemy.alpha))*ds ; 
+        dB = Math.sin(Utils.toRad(enemy.alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
         double projection = this.distanceOriginal + dA ; 

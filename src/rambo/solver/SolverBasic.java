@@ -3,15 +3,16 @@
 package rambo.solver;
 
 import java.util.List;
+import rambo.Enemy;
 import rambo.Utils;
 
 
 public class SolverBasic extends SolverAbstract {
 
-    public SolverBasic(double distance, double velocity, List<Double> velVec, List<Double> accelVec, double alpha, double dA, double dB, double bulletVelocity) {
-        super(distance, velocity, velVec, alpha, dA, dB, bulletVelocity);
+    public SolverBasic(Enemy enemy, double dA, double dB, double bulletVelocity) {
+        super(enemy, dA, dB, bulletVelocity);
     }
-    
+
     @Override
     public void solve() {
 
@@ -21,11 +22,11 @@ public class SolverBasic extends SolverAbstract {
         
         logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double ds = dt*velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
+        double ds = dt*enemy.velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
 
-        logSolver("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
-        dA = Math.cos(Utils.toRad(alpha))*ds ; 
-        dB = Math.sin(Utils.toRad(alpha))*ds ;
+        logSolver("                                                   " + enemy.alpha + ", " + ds + ", " + distanceActual) ;
+        dA = Math.cos(Utils.toRad(enemy.alpha))*ds ; 
+        dB = Math.sin(Utils.toRad(enemy.alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
         double projection = this.distanceOriginal + dA ; 

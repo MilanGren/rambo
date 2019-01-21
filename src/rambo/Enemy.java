@@ -32,7 +32,7 @@ public class Enemy {
         }
     }
     
-    private double distance, velocity, angle, enemyHeading, alpha, additionalAngle ;
+    public double distance, velocity, angle, enemyHeading, alpha, additionalAngle ;
     
     private double dA, dB ;
     
@@ -40,17 +40,17 @@ public class Enemy {
     
     Map<Double, Double[]> dXYmap = new HashMap<>() ;
     
-    List<Double> dx_vec = new ArrayList<>() ;
-    List<Double> dy_vec = new ArrayList<>() ;
-    List<Double> xC_vec = new ArrayList<>() ;
-    List<Double> yC_vec = new ArrayList<>() ;
-    List<Integer> time_vec = new ArrayList<>() ;
-    List<Double> eneVec = new ArrayList<>() ;
-    List<Boolean> wasFired = new ArrayList<>() ;
-    List<Double> velVec = new ArrayList<>() ;
+    public List<Double> dx_vec = new ArrayList<>() ;
+    public List<Double> dy_vec = new ArrayList<>() ;
+    public List<Double> xC_vec = new ArrayList<>() ;
+    public List<Double> yC_vec = new ArrayList<>() ;
+    public List<Integer> time_vec = new ArrayList<>() ;
+    public List<Double> eneVec = new ArrayList<>() ;
+    public List<Boolean> wasFired = new ArrayList<>() ;
+    public List<Double> velVec = new ArrayList<>() ;
     //List<Double> velAveVec = new ArrayList<>() ;
-    List<Double> accelVec = new ArrayList<>() ;
-    List<Integer> accelDir = new ArrayList<>() ;
+    public List<Double> accelVec = new ArrayList<>() ;
+    public List<Integer> accelDirVec = new ArrayList<>() ;
     
     
     public void set(double xC, double yC,double dx, double dy, double absAngle,double energy,long time) {
@@ -73,7 +73,7 @@ public class Enemy {
             //velAveVec.add(0.0) ;
             accelVec.add(0.0) ;
             wasFired.add(false) ;
-            accelDir.add(0) ;
+            accelDirVec.add(0) ;
             
         } else {
             dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
@@ -93,13 +93,13 @@ public class Enemy {
             
             if (Math.abs(accel) < 0.00001) {
                 logEnemy(" no speed change");
-                accelDir.add(0) ;
+                accelDirVec.add(0) ;
             } else if (accel*vAve < 0) {
                 logEnemy(" sloving down");
-                accelDir.add(-1) ;
+                accelDirVec.add(-1) ;
             } else {
                 logEnemy(" accelerating");
-                accelDir.add(1) ;
+                accelDirVec.add(1) ;
             }
             
             
@@ -119,7 +119,7 @@ public class Enemy {
                          + " vel " + Utils.round(velVec.get(index),2)
                          //+ " velAve " + Utils.round(velAveVec.get(index),2)
                          + " accel " + Utils.round(accelVec.get(index),2)
-                         + " accelDir " + Utils.round(accelDir.get(index),2)
+                         + " accelDir " + Utils.round(accelDirVec.get(index),2)
                          + " energy " + Utils.round(eneVec.get(index),2)
                          + " wasFired " + wasFired.get(index) ) ;
                 index++ ;
@@ -166,8 +166,8 @@ public class Enemy {
     
 
     public void fin(double bulletVelocity) {
-        SolverAbstract solver = new SolverAdvanced (this.distance,this.velocity,this.velVec, this.accelVec, this.accelDir, this.alpha, 0, 0, bulletVelocity) ;
-        //SolverAbstract solver = new SolverBasic (this.distance,this.velocity,this.velVec, this.accelVec, this.alpha, 0, 0, bulletVelocity) ;
+        SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
+        //SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
