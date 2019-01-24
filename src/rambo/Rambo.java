@@ -59,7 +59,7 @@ public class Rambo extends AdvancedRobot {
     
     boolean firstRingReached = false, setBodyToEnemyLock = false, approachingEnemy, enemyWasFoundFirstTime = false ;
     
-    int moveDirection = -1 ;
+    int moveDirection = 1 ;
     
     boolean tooCloseToWallLock = false ;
     
@@ -112,7 +112,6 @@ public class Rambo extends AdvancedRobot {
         
 
         setColors(Color.blue,Color.yellow,Color.white); // body,gun,radar
-
         setAdjustRadarForGunTurn(true) ;
         setAdjustGunForRobotTurn(true) ;
         
@@ -129,8 +128,7 @@ public class Rambo extends AdvancedRobot {
             log("---------- EOC " + round + " getTime" + getTime() + "\n") ;
             round++ ;
             execute() ;
- 
-  
+
             
         }
         
@@ -141,6 +139,7 @@ public class Rambo extends AdvancedRobot {
             if (!tooCloseToWallLock) {
                 log("  wallSurfaceAngle " + wallSurfaceAngle + "\n") ;
                 tooCloseToWallLock = true ;
+                setBodyToEnemyLock = true ;
             }
 	}
     }
@@ -171,13 +170,13 @@ public class Rambo extends AdvancedRobot {
         }
 
 */
-
+/*
         if (ai.dtime + 3 > ai.getAveHitDt()+25) {
             logMove("CHANGE TANK DIRECTION: ai.dtime " + ai.dtime + " ai.getAveHitDt() " + ai.getAveHitDt()) ;
             moveDirection *= -1 ;
             ai.dtime = 0 ;
         }
-
+*/
         
         if (!enemyWasFoundFirstTime) { //da se toho zbavit?
             setTurnRadarRight(90) ;
@@ -193,33 +192,20 @@ public class Rambo extends AdvancedRobot {
         
         if (tooCloseToWallLock) {    
             setMaxVelocity(Rules.MAX_VELOCITY*0.7);
-            setBodyToEnemyLock = true ;
             logMove("1: holdSettingToBullet " + setBodyToEnemyLock) ;
-
-            double moveLeftBy = normalizeBearing(getHeadingInvariant()-wallSurfaceAngle) ;
-            logMove("1: move left by " + moveLeftBy) ;
-            
-            double remains = normalizeBearing(getHeadingInvariant()) - normalizeBearing(wallSurfaceAngle) ;
-     
-            logMove("1: remains " + remains) ;
-            if (Math.abs( remains ) > 5) {
-                logMove("1: moving left because " + Math.abs( remains ) ) ;
-                setTurnLeft(moveLeftBy) ;
-                
+            double moveLeftBy = normalizeBearing(getHeadingInvariant() - wallSurfaceAngle) ;
+            if (Math.abs( moveLeftBy ) > 5) {
+                logMove("1: moving left because " + Math.abs( moveLeftBy     ) ) ;
+                setTurnLeft(moveLeftBy) ;    
             } else {
-                setTurnLeft(0) ;
+                setTurnLeft(2) ;
                 tooCloseToWallLock = false ;
             }
-            
             logMove("1: getheading " + getHeadingInvariant()) ;
-            
-            
         } else {
             //setMaxVelocity(Rules.MAX_VELOCITY);
             setMaxVelocity(0) ;
-            //logMove("doMove 2: not within wall boundary") ;
-            //logMove("doMove 2: getheading " + getHeadingInvariant()) ;
-            setBodyToEnemyLock = false ; //pokud jsem uniknul ...
+
         }
         
     }
@@ -311,15 +297,15 @@ public class Rambo extends AdvancedRobot {
         else {
             firstRingReached = false ;
             approachingEnemy = true ;
-            //setTurnRight( e_bearing ) ; 
-            setBodyToEnemy(e_bearing,distance,0) ;//35) ;
-            setWhenClose(e) ; 
+            setTurnRight( e_bearing ) ; 
+            //setBodyToEnemy(e_bearing,distance,0) ;//35) ;
+            //setWhenClose(e) ; 
             
             ai.allowFire = true ;
             
             //TODO - strileni by melo byt vypnuto
-
-            logRadar("onScanned 3: is too far     distance = " + distance) ;
+            logRadar("ai.allowFire" + ai.allowFire) ;
+            logRadar("onScanned 3: is too far ... distance = " + distance) ;
            
         }
     }

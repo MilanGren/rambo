@@ -42,9 +42,9 @@ public class EnemyTest {
     public void testToRad() {
         System.out.println("toRad");
         double x = 120.0;
-        Enemy instance = new Enemy();
+        Enemy instance = new Enemy(false);
         double expResult = 2.0943951024 ;
-        double result = instance.toRad(x);
+        double result = Utils.toRad(x);
         assertEquals(expResult, result, 0.0001);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");
@@ -57,9 +57,9 @@ public class EnemyTest {
     public void testToDeg() {
         System.out.println("toDeg");
         double x = Math.PI/4;
-        Enemy instance = new Enemy();
+        Enemy instance = new Enemy(false);
         double expResult = 45;
-        double result = instance.toDeg(x);
+        double result = Utils.toDeg(x);
         assertEquals(expResult, result, 0.0001);
         // TODO review the generated test code and remove the default call to fail.
         //fail("The test case is a prototype.");

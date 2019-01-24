@@ -5,11 +5,27 @@
  */
 package rambo;
 
+import java.util.Random;
+
 /**
  *
  * @author gre
  */
 public class Utils {
+    
+    
+    public static double getRandom(int min, int max) {
+
+            if (min >= max) {
+                    throw new IllegalArgumentException("max must be greater than min");
+            }
+
+            Random r = new Random();
+            
+            return min + (max - min) * r.nextDouble();
+  
+    }
+
     
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
