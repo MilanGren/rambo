@@ -36,7 +36,7 @@ public class SolverAdvanced extends SolverAbstract {
         
         
         if (accelDir == 0) {
-            logSolver("0 accel " + accel) ;
+            logSolver("0 accel " + Utils.round(accel,3)) ;
             dtM = 0 ;
             ds = v0*dt ;
         } else if (accelDir < 0) { // potom predpokladam zpomalovani
@@ -69,7 +69,7 @@ public class SolverAdvanced extends SolverAbstract {
         
         logSolver("dtM " + dtM) ;
         logSolver("dt " + Utils.round(dt,1) + " a " + Utils.round(accel,2) + " ds " + Utils.round(ds,1) + " dsOld " + Utils.round(dsOld,1)) ;
-        logSolver("velocity " + enemy.velocity + " velVec last" + Utils.round(enemy.velVec.get(enemy.velVec.size()-1),2)) ;
+        logSolver("velocity " + enemy.velocity + " velVec last " + Utils.round(enemy.velVec.get(enemy.velVec.size()-1),2)) ;
         
         
 // this.velocity nahradit nejakou stredni hodnotou pres budoucnost

@@ -28,7 +28,7 @@ public class Rambo extends AdvancedRobot {
     }
     
     public <T> void logFire(T t) {
-    //    System.out.println(t) ;
+        System.out.println(t) ;
     }
     
     public <T> void logRadar(T t) {
@@ -47,21 +47,17 @@ public class Rambo extends AdvancedRobot {
     }
     
 
-    
-
-       
-
     double wallSurfaceAngle ; //uhel potoceni vuci smeru nahoru
   
     double epsilon = 1e-8 ; boolean tankFoundFirstTime = false ;
    
     double angleToEnemy ; //uhel mezi predchozim a aktualnim monitoringem nepritele
     
-    boolean firstRingReached = false, setBodyToEnemyLock = false, approachingEnemy, enemyWasFoundFirstTime = false ;
+    boolean firstRingReached = false, setBodyToEnemy = false, approachingEnemy, enemyWasFoundFirstTime = false ;
     
-    int moveDirection = 1 ;
+    int moveDirection = -1 ;
     
-    boolean tooCloseToWallLock = false ;
+    boolean tooCloseToWall = false ;
     
     List<Integer> hitsReceived = new ArrayList<>() ;
     
@@ -136,10 +132,10 @@ public class Rambo extends AdvancedRobot {
     
     public void onCustomEvent(CustomEvent e) {
 	if (e.getCondition().getName().equals("too_close_to_walls")) {
-            if (!tooCloseToWallLock) {
+            if (!tooCloseToWall) {
                 log("  wallSurfaceAngle " + wallSurfaceAngle + "\n") ;
-                tooCloseToWallLock = true ;
-                setBodyToEnemyLock = true ;
+                tooCloseToWall = true ;
+                setBodyToEnemy = false ;
             }
 	}
     }
@@ -179,32 +175,32 @@ public class Rambo extends AdvancedRobot {
 */
         
         if (!enemyWasFoundFirstTime) { //da se toho zbavit?
-            setTurnRadarRight(90) ;
+            setTurnRadarRight(360) ;
         } else {
             double[] radar_direction = {Math.sin(getRadarHeadingRadians()),Math.cos(getRadarHeadingRadians())} ;
             double dire = Utils.angleDirection(enemy.direction(),radar_direction) ;
             double angle = Utils.scalar(enemy.direction(),radar_direction) ;
             logRadar(".... angle to enemy " + angle) ;
             logRadar(".... direction to enemy " + dire) ;
-            //setTurnRadarRight(dire*45) ;
             setTurnRadarRight(angle) ;
         }
         
-        if (tooCloseToWallLock) {    
+        if (tooCloseToWall) {    
             setMaxVelocity(Rules.MAX_VELOCITY*0.7);
-            logMove("1: holdSettingToBullet " + setBodyToEnemyLock) ;
+            logMove("1: holdSettingToBullet " + setBodyToEnemy) ;
             double moveLeftBy = normalizeBearing(getHeadingInvariant() - wallSurfaceAngle) ;
-            if (Math.abs( moveLeftBy ) > 5) {
-                logMove("1: moving left because " + Math.abs( moveLeftBy     ) ) ;
-                setTurnLeft(moveLeftBy) ;    
-            } else {
-                setTurnLeft(2) ;
-                tooCloseToWallLock = false ;
+            setTurnLeft(moveLeftBy) ;
+            logMove("1: moving left " + moveLeftBy ) ;
+            
+            if (Math.abs(getTurnRemaining()) < 1) {
+                logMove("1: ESCAPED WALL " + tooCloseToWall) ;
+                tooCloseToWall = false ;
+                setBodyToEnemy = true ;
             }
-            logMove("1: getheading " + getHeadingInvariant()) ;
+
         } else {
             //setMaxVelocity(Rules.MAX_VELOCITY);
-            setMaxVelocity(0) ;
+            setMaxVelocity(8) ;
 
         }
         
@@ -229,9 +225,9 @@ public class Rambo extends AdvancedRobot {
         
         enemy.setForFire(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading()) ;
 
-        double firepower = 1 ;
+        double firepower = ai.getFirepower(distance) ;
  
-        enemy.fin(20 - 3*firepower) ;
+        enemy.fin(ai.bulletSpeed) ;
                 
         //setGun is happening when moving tank body
         //gun starts to move respecting predictions of enemy. It does not respect moving of self body => the smaller e.getBearing is, the better. 
@@ -249,8 +245,8 @@ public class Rambo extends AdvancedRobot {
         //if (getGunHeat() <= 0)   {
             double energy = getEnergy() ;
             logFire("fire!") ;
+            logFire(" ai.getFirepower(distance) " + firepower) ;
             setFire(firepower) ;
-            //fire(firepower) ;
             double gh = 1+firepower/5 ;
         } else {
         //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
@@ -314,7 +310,7 @@ public class Rambo extends AdvancedRobot {
    
     private void setBodyToEnemy(double b,double distance,double fixingDBabs) {
 //log("setBodyPerpendicularlyToBullet hold  = " + holdSettingToBullet) ;        
-        if (setBodyToEnemyLock == false) {
+        if (setBodyToEnemy) {
         
             double angle = 0;
             double bfixed = 0;
@@ -352,7 +348,7 @@ public class Rambo extends AdvancedRobot {
                 setTurnLeft(angle) ;
             //}
         } else {
-            logMove("holding setting perp to bullet: " + setBodyToEnemyLock) ;
+            logMove("holding setting perp to bullet: " + setBodyToEnemy) ;
         }
                
     }

@@ -14,6 +14,11 @@ import rambo.Enemy;
  */
 public abstract class SolverAbstract {
     
+    protected <T> void logSolver(T t) {
+        System.out.println("Solver " + t) ;
+    }
+    
+    
     public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle ;
 
     
@@ -32,10 +37,7 @@ public abstract class SolverAbstract {
         this.bulletVelocity = bulletVelocity ;
     }
     
-    protected <T> void logSolver(T t) {
-        System.out.println("Solver " + t) ;
-    }
-    
+ 
     protected double timeForBullet(double distance,double bulletVelocity) {
         double timeForBullet = distance/bulletVelocity ;
         //log("bullet velocity " + bulletVelocity) ;

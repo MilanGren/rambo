@@ -1,0 +1,8 @@
+
+
+avoiding walls
+	if my getHeading is 111 deg and I reach the right wall (-90 deg) then
+	I need to turn by angle 111 - (-90) = 201 left or 360 - 201 right (-left)
+
+
+	

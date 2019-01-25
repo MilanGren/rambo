@@ -7,6 +7,10 @@ package rambo;
 
 import java.util.ArrayList;
 import java.util.List;
+import rambo.interpolator.Interpolator;
+
+//import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+//import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 /**
  *
@@ -15,7 +19,7 @@ import java.util.List;
 public class AI {
     
     public static final double WALLMARGIN = 160 ; //150
-    public static final double FIRSTRINGRADIUS = 100 ;
+    public static final double FIRSTRINGRADIUS = 300 ;
     public static final double SECONDRINGRADIUS = 500 ;
     
     public List<Double> xVec = new ArrayList<>() ;
@@ -28,6 +32,8 @@ public class AI {
 
     boolean useLog = true ;
     
+    public double bulletSpeed ;
+    
     public AI(boolean useLog) {
         this.useLog = useLog ;
     }
@@ -35,8 +41,29 @@ public class AI {
     
     
     public <T> void logAI(T t) {
-        System.out.println("AI " + t) ;
+        System.out.println("Rambo AI " + t) ;
     }
+    
+    
+    public double getFirepower(double distance)  {
+        
+        double x[] = {FIRSTRINGRADIUS,SECONDRINGRADIUS} ;
+        double y[] = {2.0,1.0} ;
+        
+        Interpolator l = new Interpolator(x,y) ;
+        
+        double firepower = l.interpolate(distance) ;
+        
+        bulletSpeed = 20 - 3*firepower ;
+        
+        logAI("distance = " + distance + " => firepower " + firepower + " => bullet speed " + bulletSpeed) ;
+    
+        return firepower ;
+        
+    }
+    
+    
+    
     
     public double getTotalDistance() {
         double tot = 0;

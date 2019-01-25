@@ -14,7 +14,7 @@ import java.util.Random;
 public class Utils {
     
     
-    public static double getRandom(int min, int max) {
+    public static double getRandom(double min, double max) {
 
             if (min >= max) {
                     throw new IllegalArgumentException("max must be greater than min");
