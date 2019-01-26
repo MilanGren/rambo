@@ -5,4 +5,45 @@ avoiding walls
 	I need to turn by angle 111 - (-90) = 201 left or 360 - 201 right (-left)
 
 
-	
+
+
+pokud 111, potom dopad 180 - 111 = 79
+
+PRAVA STENA
+pokud 160, potom 
+
+
+pokud 160, potom je dopad 180 - 160 = 20 
+pokud 20, potom je dopad 20 
+
+
+
+
+HORNI STENA
+pokud 20 potom je dopad 90 - 20 = 70
+pokud -20 potom je dopad  
+
+
+160 - -90 = 250
+160 + -90 = 70
+   \
+    \  
+     \
+  <---\
+
+20 - 90 do prava
+ <--/
+   /
+  /
+ /
+
+
+
+
+
+
+
+
+
+#############
+

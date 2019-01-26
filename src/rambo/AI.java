@@ -8,6 +8,7 @@ package rambo;
 import java.util.ArrayList;
 import java.util.List;
 import rambo.interpolator.Interpolator;
+import robocode.Rules;
 
 //import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 //import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
@@ -19,7 +20,7 @@ import rambo.interpolator.Interpolator;
 public class AI {
     
     public static final double WALLMARGIN = 160 ; //150
-    public static final double FIRSTRINGRADIUS = 300 ;
+    public static final double FIRSTRINGRADIUS = 250 ;
     public static final double SECONDRINGRADIUS = 500 ;
     
     public List<Double> xVec = new ArrayList<>() ;
@@ -41,14 +42,15 @@ public class AI {
     
     
     public <T> void logAI(T t) {
-        System.out.println("Rambo AI " + t) ;
+        //System.out.println("Rambo AI " + t) ;
     }
     
     
     public double getFirepower(double distance)  {
         
-        double x[] = {FIRSTRINGRADIUS,SECONDRINGRADIUS} ;
-        double y[] = {2.0,1.0} ;
+        double x[] = {100,FIRSTRINGRADIUS,SECONDRINGRADIUS} ;
+        //double y[] = {Rules.MAX_BULLET_POWER,Rules.MAX_BULLET_POWER/2,1.0} ;
+        double y[] = {Rules.MAX_BULLET_POWER,Rules.MAX_BULLET_POWER*2/3,Rules.MAX_BULLET_POWER/2} ;
         
         Interpolator l = new Interpolator(x,y) ;
         

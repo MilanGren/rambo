@@ -15,7 +15,7 @@ import rambo.Enemy;
 public abstract class SolverAbstract {
     
     protected <T> void logSolver(T t) {
-        System.out.println("Solver " + t) ;
+        //System.out.println("Solver " + t) ;
     }
     
     
