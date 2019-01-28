@@ -170,27 +170,19 @@ public class Enemy {
                 
                 index_actual = status_tpoints.get(i) ;
                 index_prev   = status_tpoints.get(i-1) ;
-                logInfo(index_actual) ;
-                logInfo(status_tpoints) ;
-                logInfo(dx_vec.size()) ;
-                dTimeMean += status_tpoints.get(index_actual) - status_tpoints.get(index_prev) ;
-                logInfo(i + " status_tpoint " + status_tpoints.get(index_actual) +
-                            //" dx dy " + dx_vec.get(i) + "  " + dy_vec.get(index_actual) +
-                            " dTime " + (status_tpoints.get(index_actual) - status_tpoints.get(index_prev)) )  ; 
+
+                logInfo("status_tpoints " + status_tpoints) ;
                 
-                // ddxMean += (dx_vec.get(i) - dx_vec.get(-1)) ;
+                dTimeMean += time_vec.get(index_actual) - time_vec.get(index_prev) ;
+                logInfo("dTime1 " + (time_vec.get(index_actual) - time_vec.get(index_prev)) ) ;
+                logInfo("dTime2 " + (status_tpoints.get(i) - status_tpoints.get(i-1))) ;
+
                 ddxMean += (dx_vec.get(index_actual) - dx_vec.get(index_prev)) ;
                 ddyMean += (dy_vec.get(index_actual) - dy_vec.get(index_prev)) ;
                 ddrMean += (Utils.sqrtform((dx_vec.get(index_actual) - dx_vec.get(index_prev)),(dy_vec.get(index_actual) - dy_vec.get(index_prev)))) ;
-                //enemyVelocityMean = ddrMean/(status_tpoints.get(i)-status_tpoints.get(-)) ;
+                
             }
             
-            //ddxMean = 
-            
-            //double ddr = Utils.sqrtform(ddxMean,ddyMean) ;
-            
-            //logInfo("\nddrMean " + ddxMean) ;
-            //logInfo("(dx_vec.size()-2) " + (status_tpoints.size()-2)) ;
             
             ddrMean = ddrMean/(status_tpoints.size()-2) ; 
             ddxMean = ddxMean/(status_tpoints.size()-2) ; 
