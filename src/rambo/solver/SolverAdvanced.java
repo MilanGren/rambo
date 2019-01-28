@@ -14,7 +14,7 @@ public class SolverAdvanced extends SolverAbstract {
 
     
     @Override
-    public void solve() {
+    public double solve() {
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
         logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
@@ -93,6 +93,7 @@ public class SolverAdvanced extends SolverAbstract {
         logSolver("  fixing additional angle " + this.additionalAngle) ; 
         this.i++ ;
         logSolver("\n") ;
+        return dt ;
     }
 
 

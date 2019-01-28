@@ -13,6 +13,9 @@ import java.util.Random;
  */
 public class Utils {
     
+    public static double sqrtform(double a, double b) {
+        return Math.pow(Math.pow(a,2) + Math.pow(b,2) , 0.5) ;
+    }
     
     public static double getRandom(double min, double max) {
 

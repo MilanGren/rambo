@@ -46,7 +46,8 @@ public abstract class SolverAbstract {
         return timeForBullet ;
     }
     
-    public abstract void solve() ;
+    //public abstract void solve() ;
+    public abstract double solve() ;
     
     
     

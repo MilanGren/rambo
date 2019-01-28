@@ -20,7 +20,7 @@ import robocode.Rules;
 public class AI {
     
     public static final double WALLMARGIN = 160 ; //150
-    public static final double FIRSTRINGRADIUS = 250 ;
+    public static final double FIRSTRINGRADIUS = 100 ;
     public static final double SECONDRINGRADIUS = 500 ;
     
     public List<Double> xVec = new ArrayList<>() ;
@@ -63,10 +63,7 @@ public class AI {
         return firepower ;
         
     }
-    
-    
-    
-    
+ 
     public double getTotalDistance() {
         double tot = 0;
         for(int i=0; i<xVec.size()-1; i++){

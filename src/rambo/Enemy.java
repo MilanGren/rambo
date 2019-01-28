@@ -34,17 +34,20 @@ public class Enemy {
     
     public double distance, velocity, angle, enemyHeading, alpha, additionalAngle ;
     
+    
+    
     private double dA, dB ;
     
-    private double xC, yC, dx, dy, absAngle ; // udelat gettery???
+    public double xC, yC, dx, dy, absAngle ; // udelat gettery???
     
-    Map<Double, Double[]> dXYmap = new HashMap<>() ;
+    //Map<Double, Double[]> dXYmap = new HashMap<>() ;
     
     public List<Double> dx_vec = new ArrayList<>() ;
     public List<Double> dy_vec = new ArrayList<>() ;
     public List<Double> xC_vec = new ArrayList<>() ;
     public List<Double> yC_vec = new ArrayList<>() ;
     public List<Integer> time_vec = new ArrayList<>() ;
+    public List<Integer> status_tpoints = new ArrayList<>() ;
     public List<Double> eneVec = new ArrayList<>() ;
     public List<Boolean> wasFired = new ArrayList<>() ;
     public List<Double> velVec = new ArrayList<>() ;
@@ -52,8 +55,14 @@ public class Enemy {
     public List<Double> accelVec = new ArrayList<>() ;
     public List<Integer> accelDirVec = new ArrayList<>() ;
     
+    public List<Integer> predictedHitTimeBuffer = new ArrayList<>() ;
+    int predictedHitTime ;
     
     public void set(double xC, double yC,double dx, double dy, double absAngle,double energy,long time) {
+        
+        //time_vec jde vzdy s dx_vec a dy_vec
+        
+        //pokud chci najit dx_vec pro dany time, potom musim najit index v time_vec
         
         this.xC = xC ;
         this.yC = yC ;
@@ -142,6 +151,57 @@ public class Enemy {
         logEnemy("heading relative to alpha " + normalizeBearing(alpha) ) ;
     }
    
+    public <T> void logInfo(T t) {
+        System.out.println("info " + t) ;
+    }
+    
+    public void statusInfo() {
+        double ddxMean = 0, ddyMean = 0, ddrMean = 0, dTimeMean = 0 ;
+        
+        //ddxMean: dx2 - dx1 .. zmena vzalenosti mezi tankama
+        //  pokud konstantni, potom se vzalenost nemeni
+        
+        //ddr
+        int index_actual, index_prev ;
+        if (status_tpoints.size() < 2) {
+        } else {
+            //System.out.println("tpoints info") ;
+            for (int i = 2; i < status_tpoints.size()-1;i++) {
+                
+                index_actual = status_tpoints.get(i) ;
+                index_prev   = status_tpoints.get(i-1) ;
+                logInfo(index_actual) ;
+                logInfo(status_tpoints) ;
+                logInfo(dx_vec.size()) ;
+                dTimeMean += status_tpoints.get(index_actual) - status_tpoints.get(index_prev) ;
+                logInfo(i + " status_tpoint " + status_tpoints.get(index_actual) +
+                            //" dx dy " + dx_vec.get(i) + "  " + dy_vec.get(index_actual) +
+                            " dTime " + (status_tpoints.get(index_actual) - status_tpoints.get(index_prev)) )  ; 
+                
+                // ddxMean += (dx_vec.get(i) - dx_vec.get(-1)) ;
+                ddxMean += (dx_vec.get(index_actual) - dx_vec.get(index_prev)) ;
+                ddyMean += (dy_vec.get(index_actual) - dy_vec.get(index_prev)) ;
+                ddrMean += (Utils.sqrtform((dx_vec.get(index_actual) - dx_vec.get(index_prev)),(dy_vec.get(index_actual) - dy_vec.get(index_prev)))) ;
+                //enemyVelocityMean = ddrMean/(status_tpoints.get(i)-status_tpoints.get(-)) ;
+            }
+            
+            //ddxMean = 
+            
+            //double ddr = Utils.sqrtform(ddxMean,ddyMean) ;
+            
+            //logInfo("\nddrMean " + ddxMean) ;
+            //logInfo("(dx_vec.size()-2) " + (status_tpoints.size()-2)) ;
+            
+            ddrMean = ddrMean/(status_tpoints.size()-2) ; 
+            ddxMean = ddxMean/(status_tpoints.size()-2) ; 
+            ddyMean = ddyMean/(status_tpoints.size()-2) ;
+            dTimeMean = dTimeMean/(status_tpoints.size()-2) ;
+            
+            logInfo("1 ddrMean " + ddrMean + " velocity " + ddrMean/dTimeMean + " dTimeMean " + dTimeMean) ;
+            logInfo("2 ddrMean " + Utils.sqrtform(ddxMean,ddyMean) + "\n") ;
+            
+        }
+    }
     
     public double[] direction() {
         double[] vec = {dx,dy} ;
@@ -167,16 +227,17 @@ public class Enemy {
     }
     
 
-    public void fin(double bulletVelocity) {
-        SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
-        //SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
+    public void fin(double bulletVelocity,int getTime) {
+        //SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
+        SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
-        solver.solve() ; 
+        predictedHitTime = (int) solver.solve() + getTime  ;         
         this.additionalAngle = solver.additionalAngle ;
+        
     }
     
     

@@ -14,7 +14,7 @@ public class SolverBasic extends SolverAbstract {
     }
 
     @Override
-    public void solve() {
+    public double solve() {
 
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
@@ -40,6 +40,8 @@ public class SolverBasic extends SolverAbstract {
         logSolver("  fixing additional angle " + this.additionalAngle) ; 
         this.i++ ;
         logSolver("\n") ;
+        
+        return dt ;
     }
 
 
