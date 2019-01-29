@@ -13,6 +13,10 @@ import java.util.Random;
  */
 public class Utils {
     
+    public static <T> void logUtils(T t) {
+        System.out.println("Utils " + t) ;
+    }
+    
     public static double sqrtform(double a, double b) {
         return Math.pow(Math.pow(a,2) + Math.pow(b,2) , 0.5) ;
     }
@@ -38,9 +42,13 @@ public class Utils {
         return (double) tmp / factor;
     }
     
-    public static double scalar(double[] a,double[] b) {
+    public static double scalar2(double[] a,double[] b) {
         double sizeA = Math.pow((Math.pow(a[0],2) + Math.pow(a[1],2)),0.5) ;
         double sizeB = Math.pow((Math.pow(b[0],2) + Math.pow(b[1],2)),0.5) ;
+        
+        logUtils("a " + (a[0]/sizeA) + " " + (a[1]/sizeA)) ;
+        logUtils("b " + (b[0]/sizeB) + " " + (b[1]/sizeB)) ;
+        
         double cosAlpha = (a[0]*b[0]+a[1]*b[1])/sizeA/sizeB ;
         double direction ;
         if (a[0]*b[1] - a[1]*b[0] < 0) {
@@ -50,6 +58,22 @@ public class Utils {
         }
         return toDeg(direction*Math.acos(cosAlpha)) ;
     }
+    
+    public static double scalar(double[] a,double[] b) {
+        double sizeA = Math.pow((Math.pow(a[0],2) + Math.pow(a[1],2)),0.5) ;
+        double sizeB = Math.pow((Math.pow(b[0],2) + Math.pow(b[1],2)),0.5) ;
+        
+        double cosAlpha = (a[0]*b[0]+a[1]*b[1])/sizeA/sizeB ;
+        double direction ;
+        if (a[0]*b[1] - a[1]*b[0] < 0) {
+            direction = -1 ;
+        } else {
+            direction = 1 ;
+        }
+        return toDeg(direction*Math.acos(cosAlpha)) ;
+    }
+    
+    
     
     public static double angleDirection(double[] a,double[] b) {
         double direction ;

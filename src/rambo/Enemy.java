@@ -5,6 +5,7 @@
  */
 package rambo;
 
+import rambo.exceptions.WrongTimeStatusException;
 import rambo.solver.SolverAbstract ;
 import rambo.solver.SolverBasic ;
 import rambo.solver.SolverAdvanced ;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -32,7 +35,9 @@ public class Enemy {
         }
     }
     
-    public double distance, velocity, angle, enemyHeading, alpha, additionalAngle ;
+    public double distance, velocity, velocityAI, angle, enemyHeading, alpha, alphaAI = 0, additionalAngle ;
+    
+    public int timeNow ;
     
     
     
@@ -47,18 +52,39 @@ public class Enemy {
     public List<Double> xC_vec = new ArrayList<>() ;
     public List<Double> yC_vec = new ArrayList<>() ;
     public List<Integer> time_vec = new ArrayList<>() ;
-    public List<Integer> status_tpoints = new ArrayList<>() ;
+    public List<Integer> expected_hits_timepoints = new ArrayList<>() ;
     public List<Double> eneVec = new ArrayList<>() ;
     public List<Boolean> wasFired = new ArrayList<>() ;
     public List<Double> velVec = new ArrayList<>() ;
+    public List<Integer> headingVec = new ArrayList<>() ;
     //List<Double> velAveVec = new ArrayList<>() ;
     public List<Double> accelVec = new ArrayList<>() ;
     public List<Integer> accelDirVec = new ArrayList<>() ;
     
+    
+    public Map<Integer, Double> alphaMap = new HashMap<>() ;
+    
     public List<Integer> predictedHitTimeBuffer = new ArrayList<>() ;
     int predictedHitTime ;
     
-    public void set(double xC, double yC,double dx, double dy, double absAngle,double energy,long time) {
+    
+    /*
+    public void setTime(long time) {
+        timeNow = time ;
+        time_vec.add((int) time) ;  //cas se zapisuje vzdy, kdy nepritele uvidim
+    }
+    */
+    private int getHeadingVec(double heading) {
+        double[] hding = {Math.sin(Utils.toRad(heading+1)),Math.cos(Utils.toRad(heading+5))} ; //5 aby to nedavalo Nan - HACK
+        double[] ddr = {(dx_vec.get(xC_vec.size()-1) - dx_vec.get(xC_vec.size()-2)),(dy_vec.get(yC_vec.size()-1) - dy_vec.get(yC_vec.size()-2))} ;
+        if (Utils.scalar(hding,ddr) < -90 || Utils.scalar(hding,ddr) > 90) {
+            return -1 ;
+        } else {
+            return 1 ;
+        }
+    }
+    
+    public void set(double xC, double yC,double dx, double dy, double absAngle,double energy, double heading, long time) {
         
         //time_vec jde vzdy s dx_vec a dy_vec
         
@@ -73,8 +99,10 @@ public class Enemy {
         dy_vec.add(dy) ;
         xC_vec.add(xC) ;
         yC_vec.add(yC) ;
-        time_vec.add((int) time) ;
+        timeNow = (int) time ;
+        time_vec.add((int) time) ;  //cas se zapisuje vzdy, kdy nepritele uvidim
         eneVec.add(energy) ;
+
         
         double dds ;
         if (time_vec.size() == 1) {
@@ -83,8 +111,12 @@ public class Enemy {
             accelVec.add(0.0) ;
             wasFired.add(false) ;
             accelDirVec.add(0) ;
-            
+            headingVec.add(1) ;
+
         } else {
+                
+            headingVec.add( getHeadingVec(heading) ) ;
+            
             dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
             double dtime = time_vec.get(time_vec.size()-1) - time_vec.get(time_vec.size()-2) ; 
             
@@ -143,12 +175,14 @@ public class Enemy {
         this.velocity = velocity ;
         this.angle = angle ;     //absolute - odklon nepritele od Y souradnice
         this.enemyHeading = enemyHeading ;
-        this.alpha =  this.angle - this.enemyHeading ; // uhel, pod kterym nepritel unika v ramci spojnice ja-nepritel
+        this.alpha =  normalizeBearing(this.angle - this.enemyHeading) ; // uhel, pod kterym nepritel unika v ramci spojnice ja-nepritel
         logEnemy("velocity " + velocity) ;
         logEnemy("angle " + normalizeBearing(angle)) ;
         logEnemy("alpha " + normalizeBearing(alpha)) ;
         logEnemy("heading " + enemyHeading) ;
         logEnemy("heading relative to alpha " + normalizeBearing(alpha) ) ;
+        alphaMap.put(timeNow,alpha) ;
+        //System.out.println("alpha " + normalizeBearing(alpha) + "for time " + timeNow) ;
     }
    
     public <T> void logInfo(T t) {
@@ -162,34 +196,64 @@ public class Enemy {
         //  pokud konstantni, potom se vzalenost nemeni
         
         //ddr
-        int index_actual, index_prev ;
-        if (status_tpoints.size() < 2) {
+        int index_actual, index_prev, time_actual, time_prev ;
+        if (expected_hits_timepoints.size() < 2) {
         } else {
-            //System.out.println("tpoints info") ;
-            for (int i = 2; i < status_tpoints.size()-1;i++) {
-                
-                index_actual = status_tpoints.get(i) ;
-                index_prev   = status_tpoints.get(i-1) ;
+            
+            logInfo("\n --- STATUS --- ") ;
+            logInfo("status_tpoints " + expected_hits_timepoints) ;
+            
+            for (int i = 2; i <= expected_hits_timepoints.size()-1;i++) {
 
-                logInfo("status_tpoints " + status_tpoints) ;
-                
-                dTimeMean += time_vec.get(index_actual) - time_vec.get(index_prev) ;
-                logInfo("dTime1 " + (time_vec.get(index_actual) - time_vec.get(index_prev)) ) ;
-                logInfo("dTime2 " + (status_tpoints.get(i) - status_tpoints.get(i-1))) ;
+                index_actual = expected_hits_timepoints.get(i) ;
+                index_prev = expected_hits_timepoints.get(i-1) ;
 
-                ddxMean += (dx_vec.get(index_actual) - dx_vec.get(index_prev)) ;
-                ddyMean += (dy_vec.get(index_actual) - dy_vec.get(index_prev)) ;
-                ddrMean += (Utils.sqrtform((dx_vec.get(index_actual) - dx_vec.get(index_prev)),(dy_vec.get(index_actual) - dy_vec.get(index_prev)))) ;
+
+                time_actual = time_vec.get(index_actual) ;
+                time_prev = time_vec.get(index_prev) ;        
                 
+                dTimeMean += time_actual - time_prev ;
+
+                try {
+                    if (time_vec.get(index_actual) - time_vec.get(index_prev) != expected_hits_timepoints.get(i) - expected_hits_timepoints.get(i-1)) {
+                        throw new WrongTimeStatusException("") ;
+                    }
+                } catch (WrongTimeStatusException ex) {
+                    Logger.getLogger(Enemy.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("System.exit(1)") ;
+                    System.exit(1) ;
+                }
+                
+                double ddx = (dx_vec.get(index_actual) - dx_vec.get(index_prev)) ;
+                double ddy = (dy_vec.get(index_actual) - dy_vec.get(index_prev)) ;
+                
+                ddxMean += ddx ;
+                ddyMean += ddy ;
+                ddrMean += Utils.sqrtform(ddx,ddy) ; 
+       
+                double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(time_prev),dy_vec.get(index_prev)*headingVec.get(time_prev)} ;
+                double[] vector_change_direction = {ddx,ddy} ;
+                
+                alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
+                velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev) ; 
+                
+                logInfo("alphaAI " + alphaAI + " must == alpha " + alphaMap.get(time_prev) + " taken from position " + time_prev + " (from) " + alphaMap) ;
+                logInfo("di " + (alphaMap.get(time_prev)-alphaAI));
+                logInfo("very last alpha " + alpha) ;
             }
             
+            ddrMean = ddrMean/(expected_hits_timepoints.size()-2) ; 
+            ddxMean = ddxMean/(expected_hits_timepoints.size()-2) ; 
+            ddyMean = ddyMean/(expected_hits_timepoints.size()-2) ;
+            dTimeMean = dTimeMean/(expected_hits_timepoints.size()-2) ;
+
+            double[] ddrVec = {ddxMean,ddyMean} ;
             
-            ddrMean = ddrMean/(status_tpoints.size()-2) ; 
-            ddxMean = ddxMean/(status_tpoints.size()-2) ; 
-            ddyMean = ddyMean/(status_tpoints.size()-2) ;
-            dTimeMean = dTimeMean/(status_tpoints.size()-2) ;
+            velocityAI = ddrMean/dTimeMean ;
             
-            logInfo("1 ddrMean " + ddrMean + " velocity " + ddrMean/dTimeMean + " dTimeMean " + dTimeMean) ;
+            logInfo(" ddxMean " + ddxMean) ;
+            logInfo(" ddyMean " + ddyMean) ;
+            logInfo("1 ddrMean " + ddrMean + " velocity " + velocityAI + " dTimeMean " + dTimeMean) ;
             logInfo("2 ddrMean " + Utils.sqrtform(ddxMean,ddyMean) + "\n") ;
             
         }

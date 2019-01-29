@@ -117,22 +117,22 @@ public class Rambo extends AdvancedRobot {
         int round = 0 ;
         
         while(true) {
-            
-            
-            //System.out.println(Utils.round(enemy.predicetedHitTime,0) + "  " + getTime());
-            
-            
-            
-            //System.out.println(getTime()) ;
-            //System.out.println(enemy.predictedHitTimeBuffer) ;
+  
             
             if (enemy.predictedHitTimeBuffer.contains((int) getTime())) {
                 //vzdy me zajima stredni rychlost a uhel odjezdu mezi dvema predpokladanymy casy dopadu
+                
+                //1. porovnavam alpha a alphaAI za predikovany cas. lepsi nez predikovany cas NEMAM
+                
+                //2. porovnavam stredni rychlosti za predikovany cas.
+                
+                //    zajima me finalni ddx, ddy - zbran nepotrebuje vedet, jak se tam dostal.. 
+                
                 int index = enemy.time_vec.indexOf((int) getTime()) ;
-                System.out.println(" index " + index) ;
-                enemy.status_tpoints.add(index) ; // body, ve kterych me zajimaji dx, dy
+                
+                enemy.expected_hits_timepoints.add(index) ; // body, ve kterych me zajimaji dx, dy
                 enemy.statusInfo() ;
-                //enemy.predictedHitTimeBuffer.remove(index) ;
+                
             }
                 
             
@@ -266,12 +266,12 @@ public class Rambo extends AdvancedRobot {
     public void onScannedRobot(ScannedRobotEvent e) {
         double distance = e.getDistance() ;
 
-        double absAngle = getHeadingRadians() + e.getBearingRadians() ;    
+        double absAngle = getHeadingRadians() + e.getBearingRadians() ; 
                         
         double dx = distance*Math.sin(absAngle) ;
         double dy = distance*Math.cos(absAngle) ;
         
-        enemy.set(getX() + dx,getY() + dy,dx,dy,absAngle,e.getEnergy(),getTime()) ;
+        enemy.set(getX() + dx,getY() + dy,dx,dy,absAngle,e.getEnergy(),e.getHeading(),getTime()) ;
         
         enemyWasFoundFirstTime = true ;
 

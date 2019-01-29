@@ -15,18 +15,19 @@ public class SolverBasic extends SolverAbstract {
 
     @Override
     public double solve() {
-
+        double alpha = enemy.alphaAI ; //nebo enemy.alpha
+        double enemyVelocity = enemy.velocityAI ; //nebo enemy.velocity
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
         logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double ds = dt*enemy.velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
+        double ds = dt*enemyVelocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
 
         logSolver("                                                   " + enemy.alpha + ", " + ds + ", " + distanceActual) ;
-        dA = Math.cos(Utils.toRad(enemy.alpha))*ds ; 
-        dB = Math.sin(Utils.toRad(enemy.alpha))*ds ;
+        dA = Math.cos(Utils.toRad(alpha))*ds ; 
+        dB = Math.sin(Utils.toRad(alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
         double projection = this.distanceOriginal + dA ; 
