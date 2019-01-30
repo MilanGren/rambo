@@ -42,7 +42,7 @@ public class AI {
     
     
     public <T> void logAI(T t) {
-        System.out.println("Rambo AI " + t) ;
+        //System.out.println("Rambo AI " + t) ;
     }
     
     
@@ -103,7 +103,7 @@ public class AI {
                 doCalcul = true ;
                 double hitDt = hitVec.get(i) - hitVec.get(i-1) ;
                 aveHitDt += hitDt ;
-           //     logAI(" dt " + hitDt) ;
+                logAI(" dt " + hitDt) ;
             }
         }
         

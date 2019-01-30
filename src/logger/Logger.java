@@ -38,7 +38,7 @@ public class Logger {
         }
         
         public static <T> void logAIinfo(T t) {
-            //System.out.println("info " + t) ;
+            System.out.println("info " + t) ;
         }
 
     }

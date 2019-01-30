@@ -115,7 +115,7 @@ public class Rambo extends AdvancedRobot {
 
                     //    zajima me finalni ddx, ddy - zbran nepotrebuje vedet, jak se tam dostal.. 
 
-                    //enemy.statusInfo((int) getTime()) ;
+                    enemy.statusInfo((int) getTime()) ;
 
                 }
 

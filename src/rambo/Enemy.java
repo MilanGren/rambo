@@ -110,6 +110,7 @@ public class Enemy {
 
         } else {
                 
+            
             headingVec.add( getHeadingVec(heading) ) ;
             
             dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
@@ -195,7 +196,7 @@ public class Enemy {
         if (hitTimeBuffer.size() < 2) {
         } else {
             
-            logAIinfo("\n --- STATUS --- ") ;
+            logAIinfo("\n --- STATUS --- " + timeNow) ;
             logAIinfo("hitTimeBuffer " + hitTimeBuffer) ;
             
             List<Integer> hitTimeBufferReduced = hitTimeBuffer.stream()     
@@ -206,16 +207,20 @@ public class Enemy {
             logAIinfo("hitTimeBufferReduced " + hitTimeBufferReduced) ;
             
             
-            for (int i = 2; i < hitTimeBufferReduced.size()-1;i++) {
-                
+            
+            for (int i = 2; i <= hitTimeBufferReduced.size()-1;i++) {
+
                 int hitTime_actual = hitTimeBufferReduced.get(i) ;
                 int hitTime_prev   = hitTimeBufferReduced.get(i-1) ;
    
                 index_actual = time_vec.indexOf(hitTime_actual) ; 
                 index_prev = time_vec.indexOf(hitTime_prev) ; 
-
+            
                 time_actual = time_vec.get(index_actual) ;
-                time_prev = time_vec.get(index_prev) ;        
+                time_prev = time_vec.get(index_prev) ; 
+                
+                
+                
                 
                 dTimeMean += time_actual - time_prev ;
 
@@ -235,18 +240,18 @@ public class Enemy {
                 ddxMean += ddx ;
                 ddyMean += ddy ;
                 ddrMean += Utils.sqrtform(ddx,ddy) ; 
-       
-                double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(time_prev),dy_vec.get(index_prev)*headingVec.get(time_prev)} ;
+                
+                double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(index_prev),dy_vec.get(index_prev)*headingVec.get(index_prev)} ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 
                 alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
-                velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev)*headingVec.get(time_prev) ; 
+                velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev)*headingVec.get(index_prev) ; 
                 
                 logAIinfo("alphaAI " + round(alphaAI,1)    + " alpha " + round(alphaMap.get(time_prev),1)) ;
                 logAIinfo("last alpha " + round(alpha,1)) ;
                 logAIinfo("velocityAI " + round(velocityAI,1) + " velocity " + round(velVec.get(time_prev),1)) ;
-                logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
-                logAIinfo("enemy heading " + headingVec.get(time_prev)) ;
+                //logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
+                //  logAIinfo("enemy heading " + headingVec.get(time_prev)) ;
                 //alphaFixing = alphaAI - alphaMap.get(time_prev) ;
             }
  
@@ -299,7 +304,9 @@ public class Enemy {
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
-        predictedHitTime = (int) solver.solve() + getTime  ;         
+        
+        predictedHitTime = (int) solver.solve() + getTime  ; 
+
         this.additionalAngle = solver.additionalAngle ;
                 
     }
