@@ -14,9 +14,7 @@ import rambo.Enemy;
  */
 public abstract class SolverAbstract {
     
-    protected <T> void logSolver(T t) {
-        //System.out.println("Solver " + t) ;
-    }
+ 
     
     
     public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle ;

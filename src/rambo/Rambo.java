@@ -103,24 +103,22 @@ public class Rambo extends AdvancedRobot {
         int round = 0 ;
         
         while(true) {
-  
             
-            if (enemy.predictedHitTimeBuffer.contains((int) getTime())) {
-                //vzdy me zajima stredni rychlost a uhel odjezdu mezi dvema predpokladanymy casy dopadu
-                
-                //1. porovnavam alpha a alphaAI za predikovany cas. lepsi nez predikovany cas NEMAM
-                
-                //2. porovnavam stredni rychlosti za predikovany cas.
-                
-                //    zajima me finalni ddx, ddy - zbran nepotrebuje vedet, jak se tam dostal.. 
-                
-                int index = enemy.time_vec.indexOf((int) getTime()) ;
-                
-                enemy.expected_hits_timepoints.add(index) ; // body, ve kterych me zajimaji dx, dy
-                enemy.statusInfo() ;
-                
-            }
-                
+            
+                if (enemy.hitTimeBuffer.size() > 0 && enemy.hitTimeBuffer.contains( (int) getTime() ) ) {  //pokud nastal cas.. 
+
+                    //vzdy me zajima stredni rychlost a uhel odjezdu mezi dvema predpokladanymy casy dopadu
+
+                    //1. porovnavam alpha a alphaAI za predikovany cas. lepsi nez predikovany cas NEMAM
+
+                    //2. porovnavam stredni rychlosti za predikovany cas.
+
+                    //    zajima me finalni ddx, ddy - zbran nepotrebuje vedet, jak se tam dostal.. 
+
+                    //enemy.statusInfo((int) getTime()) ;
+
+                }
+
             
             
             
@@ -217,22 +215,12 @@ public class Rambo extends AdvancedRobot {
         enemy.setForFire(distance,e.getVelocity(),normalizeBearing((getHeadingInvariant() + e_bearing)),e.getHeading()) ;
 
         double firepower = ai.getFirepower(distance) ;
- 
+        
         enemy.fin(ai.bulletSpeed,(int) getTime()) ;
-        
-        
-                
-        //setGun is happening when moving tank body
-        //gun starts to move respecting predictions of enemy. It does not respect moving of self body => the smaller e.getBearing is, the better. 
-        // ... This happens after the very first targeting is done. For the very first targeting the gun is overheated, so it does not fire, so
-        // ... i don't need to solve that.
-    
-        //setBodyPerpendicularlyToBullet(e.getBearing()) ;
-        
+      
         setGun(e_bearing + enemy.getAdditionalAngle()) ;
         logFire("setGun " + (e_bearing + enemy.getAdditionalAngle()) ) ;
         logFire("getGunTurnRemaining " + getGunTurnRemaining()) ;
-        
         
         if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 3 && ai.allowFire) {
             double energy = getEnergy() ;
@@ -240,7 +228,7 @@ public class Rambo extends AdvancedRobot {
             logFire(" ai.getFirepower(distance) " + firepower) ;
             setFire(firepower) ;
             double gh = 1+firepower/5 ;
-            enemy.predictedHitTimeBuffer.add( enemy.predictedHitTime ) ; //asi HACK - prasarna
+            enemy.hitTimeBuffer.add( enemy.predictedHitTime ) ; //asi HACK - prasarna
         } else {
         //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
@@ -281,7 +269,7 @@ public class Rambo extends AdvancedRobot {
             setFireMode(e) ;
             
         } else if (distance < ai.SECONDRINGRADIUS && !firstRingReached) {
-            logRadar("onScanned 2b: withing distance " + ai.SECONDRINGRADIUS) ;
+            logRadar("onScanned 2b: withing distance " + ai.SECONDRINGRADIUS + distance) ;
             logRadar("onScanned 2b: setting body by " + e_bearing) ;
             setApproachingEnemy(e_bearing);
             setFireMode(e) ;

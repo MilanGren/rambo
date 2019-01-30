@@ -3,8 +3,11 @@
 package rambo.solver;
 
 import java.util.List;
+import static logger.Logger.* ;
 import rambo.Enemy;
 import rambo.Utils;
+
+
 
 
 public class SolverBasic extends SolverAbstract {
@@ -15,13 +18,12 @@ public class SolverBasic extends SolverAbstract {
 
     @Override
     public double solve() {
-        double alpha = enemy.alphaAI ; //nebo enemy.alpha
-        double enemyVelocity = enemy.velocityAI ; //nebo enemy.velocity
+        double alpha = enemy.alpha; //nebo enemy.alpha
+        double enemyVelocity = enemy.velocity ; //nebo enemy.velocity
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
-        logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
         double ds = dt*enemyVelocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
 
@@ -30,11 +32,12 @@ public class SolverBasic extends SolverAbstract {
         dB = Math.sin(Utils.toRad(alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
+
         double projection = this.distanceOriginal + dA ; 
         
         this.additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
         
-        
+    
         logSolver("  dB " + dB + "  projection " + (projection)) ;
         logSolver("  dB/projection " + (dB/projection)) ;
         //log("fixing additional angle " + (dB/predicted)) ;
