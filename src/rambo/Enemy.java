@@ -17,23 +17,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+import static logger.Logger.Enemy.* ;
+
 /**
  *
  * @author gre
  */
 public class Enemy {
-    
-    boolean useLog = true ;
-    
-    public Enemy(boolean useLog) {
-        this.useLog = useLog ;
-    }
-   
-    public <T> void logEnemy(T t) {
-        if (useLog) {
-            //System.out.println("Enemy " + t) ;
-        }
-    }
     
     public double distance, velocity, velocityAI, angle, enemyHeading, alpha, alphaAI = 0, additionalAngle ;
     
@@ -185,9 +176,7 @@ public class Enemy {
         //System.out.println("alpha " + normalizeBearing(alpha) + "for time " + timeNow) ;
     }
    
-    public <T> void logInfo(T t) {
-        System.out.println("info " + t) ;
-    }
+  
     
     public void statusInfo() {
         double ddxMean = 0, ddyMean = 0, ddrMean = 0, dTimeMean = 0 ;
@@ -200,12 +189,12 @@ public class Enemy {
         if (expected_hits_timepoints.size() < 2) {
         } else {
             
-            logInfo("\n --- STATUS --- ") ;
-            logInfo("status_tpoints " + expected_hits_timepoints) ;
+            logAIinfo("\n --- STATUS --- ") ;
+            logAIinfo("status_tpoints " + expected_hits_timepoints) ;
             
             for (int i = 2; i <= expected_hits_timepoints.size()-1;i++) {
 
-                index_actual = expected_hits_timepoints.get(i) ;
+                index_actual = expected_hits_timepoints.get(i) ;   //time pointy v expected_hits_timepoints star
                 index_prev = expected_hits_timepoints.get(i-1) ;
 
 
@@ -237,9 +226,9 @@ public class Enemy {
                 alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
                 velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev) ; 
                 
-                logInfo("alphaAI " + alphaAI + " must == alpha " + alphaMap.get(time_prev) + " taken from position " + time_prev + " (from) " + alphaMap) ;
-                logInfo("di " + (alphaMap.get(time_prev)-alphaAI));
-                logInfo("very last alpha " + alpha) ;
+                logAIinfo("alphaAI " + alphaAI + " must == alpha " + alphaMap.get(time_prev) + " taken from position " + time_prev + " (from) " + alphaMap) ;
+                logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
+                logAIinfo("very last alpha " + alpha) ;
             }
             
             ddrMean = ddrMean/(expected_hits_timepoints.size()-2) ; 
@@ -251,10 +240,10 @@ public class Enemy {
             
             velocityAI = ddrMean/dTimeMean ;
             
-            logInfo(" ddxMean " + ddxMean) ;
-            logInfo(" ddyMean " + ddyMean) ;
-            logInfo("1 ddrMean " + ddrMean + " velocity " + velocityAI + " dTimeMean " + dTimeMean) ;
-            logInfo("2 ddrMean " + Utils.sqrtform(ddxMean,ddyMean) + "\n") ;
+            logAIinfo(" ddxMean " + ddxMean) ;
+            logAIinfo(" ddyMean " + ddyMean) ;
+            logAIinfo("1 ddrMean " + ddrMean + " velocity " + velocityAI + " dTimeMean " + dTimeMean) ;
+            logAIinfo("2 ddrMean " + Utils.sqrtform(ddxMean,ddyMean) + "\n") ;
             
         }
     }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import static logger.Logger.Rambo.* ;
 // API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
 /**
@@ -23,21 +23,7 @@ import java.util.Map;
 public class Rambo extends AdvancedRobot {
     
         
-    public <T> void logMove(T t) {
-    //    System.out.println(getTime() + " Move " + t) ;
-    }
-    
-    public <T> void logFire(T t) {
-    //    System.out.println(t) ;
-    }
-    
-    public <T> void logRadar(T t) {
-    //    System.out.println(getTime() + " Radar " + t) ;
-    }
-    
-    public <T> void log(T t) {
-    //    System.out.println(t) ;
-    }
+
     
  
     double normalizeBearing(double angle) {
@@ -64,7 +50,7 @@ public class Rambo extends AdvancedRobot {
     
     List<Integer> hitsReceived = new ArrayList<>() ;
     
-    Enemy enemy = new Enemy(true) ;
+    Enemy enemy = new Enemy() ;
     
     AI ai = new AI(false) ;
     

@@ -6,6 +6,8 @@
 package rambo;
 
 import java.util.Random;
+import logger.Logger.*;
+import static logger.Logger.*;
 
 /**
  *
@@ -13,9 +15,9 @@ import java.util.Random;
  */
 public class Utils {
     
-    public static <T> void logUtils(T t) {
-        System.out.println("Utils " + t) ;
-    }
+    
+    
+    
     
     public static double sqrtform(double a, double b) {
         return Math.pow(Math.pow(a,2) + Math.pow(b,2) , 0.5) ;
@@ -72,8 +74,6 @@ public class Utils {
         }
         return toDeg(direction*Math.acos(cosAlpha)) ;
     }
-    
-    
     
     public static double angleDirection(double[] a,double[] b) {
         double direction ;
