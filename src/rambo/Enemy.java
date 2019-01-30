@@ -241,15 +241,25 @@ public class Enemy {
                 ddyMean += ddy ;
                 ddrMean += Utils.sqrtform(ddx,ddy) ; 
                 
+                
+                logAIinfo("\n         time_actual" + time_actual) ;
+                logAIinfo("         time_prev" + time_prev) ;
+                logAIinfo("         i want heading for " + time_prev) ;
+                logAIinfo(headingVec.size()) ;
+                logAIinfo(headingVec.get(index_prev)) ;
+                logAIinfo("") ;
+                
                 double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(index_prev),dy_vec.get(index_prev)*headingVec.get(index_prev)} ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 
                 alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
                 velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev)*headingVec.get(index_prev) ; 
                 
+                //POZOR ! alphaMap je HashMap 
+                
                 logAIinfo("alphaAI " + round(alphaAI,1)    + " alpha " + round(alphaMap.get(time_prev),1)) ;
                 logAIinfo("last alpha " + round(alpha,1)) ;
-                logAIinfo("velocityAI " + round(velocityAI,1) + " velocity " + round(velVec.get(time_prev),1)) ;
+                logAIinfo("velocityAI " + round(velocityAI,1) + " velocity " + round(velVec.get(index_prev),1)) ;
                 //logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
                 //  logAIinfo("enemy heading " + headingVec.get(time_prev)) ;
                 //alphaFixing = alphaAI - alphaMap.get(time_prev) ;
