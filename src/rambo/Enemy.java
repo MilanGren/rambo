@@ -200,7 +200,7 @@ public class Enemy {
             logAIinfo("hitTimeBuffer " + hitTimeBuffer) ;
             
             List<Integer> hitTimeBufferReduced = hitTimeBuffer.stream()     
-                                    .filter(line -> line <= timeNow)  
+                                    .filter(hitTime -> hitTime <= timeNow)  
                                     .collect(Collectors.toList()); 
             
             
@@ -209,18 +209,23 @@ public class Enemy {
             
             
             for (int i = 2; i <= hitTimeBufferReduced.size()-1;i++) {
-
+logAIinfo("BOC") ;
                 int hitTime_actual = hitTimeBufferReduced.get(i) ;
                 int hitTime_prev   = hitTimeBufferReduced.get(i-1) ;
-   
+            
+logAIinfo("  hitTime_actual " + hitTime_actual ) ;
+logAIinfo("  time_vec " + time_vec) ;
                 index_actual = time_vec.indexOf(hitTime_actual) ; 
                 index_prev = time_vec.indexOf(hitTime_prev) ; 
-            
+
+logAIinfo("  time_vec.size() " + time_vec.size())  ;
+logAIinfo("  index_actual " + index_actual ) ;
+
                 time_actual = time_vec.get(index_actual) ;
                 time_prev = time_vec.get(index_prev) ; 
                 
-                
-                
+logAIinfo("MOC ") ;  
+              
                 
                 dTimeMean += time_actual - time_prev ;
 
@@ -241,14 +246,14 @@ public class Enemy {
                 ddyMean += ddy ;
                 ddrMean += Utils.sqrtform(ddx,ddy) ; 
                 
-                
+                /*
                 logAIinfo("\n         time_actual" + time_actual) ;
                 logAIinfo("         time_prev" + time_prev) ;
                 logAIinfo("         i want heading for " + time_prev) ;
                 logAIinfo(headingVec.size()) ;
                 logAIinfo(headingVec.get(index_prev)) ;
                 logAIinfo("") ;
-                
+                */
                 double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(index_prev),dy_vec.get(index_prev)*headingVec.get(index_prev)} ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 

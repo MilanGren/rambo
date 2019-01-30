@@ -18,8 +18,8 @@ public class SolverBasic extends SolverAbstract {
 
     @Override
     public double solve() {
-        double alpha = enemy.alpha; //nebo enemy.alpha
-        double enemyVelocity = enemy.velocity ; //nebo enemy.velocity
+        double alpha = enemy.alphaAI; //nebo enemy.alpha
+        double enemyVelocity = enemy.velocityAI ; //nebo enemy.velocity
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
