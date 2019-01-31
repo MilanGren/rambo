@@ -192,7 +192,7 @@ public class Enemy {
         //  pokud konstantni, potom se vzalenost nemeni
         
         //ddr
-        int index_actual, index_prev, time_actual = 0, time_prev = 0;
+        int index_actual, index_prev, time_ptr = 0, time_prev = 0;
         if (hitTimeBuffer.size() < 2) {
         } else {
             
@@ -209,28 +209,28 @@ public class Enemy {
             
             
             for (int i = 2; i <= hitTimeBufferReduced.size()-1;i++) {
-logAIinfo("BOC") ;
-                int hitTime_actual = hitTimeBufferReduced.get(i) ;
+logAIinfo("--") ;
+                int hitTime_ptr = hitTimeBufferReduced.get(i) ;
                 int hitTime_prev   = hitTimeBufferReduced.get(i-1) ;
             
-logAIinfo("  hitTime_actual " + hitTime_actual ) ;
+logAIinfo("  hitTime_actual " + hitTime_ptr ) ;
 logAIinfo("  time_vec " + time_vec) ;
-                index_actual = time_vec.indexOf(hitTime_actual) ; 
+                index_actual = time_vec.indexOf(hitTime_ptr) ; 
                 index_prev = time_vec.indexOf(hitTime_prev) ; 
 
 logAIinfo("  time_vec.size() " + time_vec.size())  ;
 logAIinfo("  index_actual " + index_actual ) ;
 
-                time_actual = time_vec.get(index_actual) ;
+                time_ptr = time_vec.get(index_actual) ;
                 time_prev = time_vec.get(index_prev) ; 
                 
-logAIinfo("MOC ") ;  
+logAIinfo(" ") ;  
               
                 
-                dTimeMean += time_actual - time_prev ;
+                dTimeMean += time_ptr - time_prev ;
 
                 try {
-                    if (time_vec.get(index_actual) - time_vec.get(index_prev) != hitTime_actual - hitTime_prev) {
+                    if (time_vec.get(index_actual) - time_vec.get(index_prev) != hitTime_ptr - hitTime_prev) {
                         throw new WrongTimeStatusException("") ;
                     }
                 } catch (WrongTimeStatusException ex) {
@@ -258,18 +258,19 @@ logAIinfo("MOC ") ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 
                 alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
-                velocityAI = Utils.sqrtform(ddx,ddy)/(time_actual - time_prev)*headingVec.get(index_prev) ; 
+                velocityAI = Utils.sqrtform(ddx,ddy)/(time_ptr - time_prev)*headingVec.get(index_prev) ; 
                 
                 //POZOR ! alphaMap je HashMap 
                 
                 logAIinfo("alphaAI " + round(alphaAI,1)    + " alpha " + round(alphaMap.get(time_prev),1)) ;
-                logAIinfo("last alpha " + round(alpha,1)) ;
                 logAIinfo("velocityAI " + round(velocityAI,1) + " velocity " + round(velVec.get(index_prev),1)) ;
-                //logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
-                //  logAIinfo("enemy heading " + headingVec.get(time_prev)) ;
+                logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
+                logAIinfo("enemy heading " + headingVec.get(index_prev)) ;
+                logAIinfo("enemy heading " + headingVec) ;
                 //alphaFixing = alphaAI - alphaMap.get(time_prev) ;
             }
- 
+            
+            logAIinfo("last alpha used " + round(alpha,1)) ;
             
             
             /*
@@ -312,7 +313,11 @@ logAIinfo("MOC ") ;
     
 
     public void fin(double bulletVelocity,int getTime) {
+        
+
         //SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
+        
+        
         SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;

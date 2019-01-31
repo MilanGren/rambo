@@ -9,6 +9,10 @@ import rambo.Utils;
 
 
 
+//vstupem je bulletVelocity, distanceOriginal, enemyVelocity
+// aktualizuju distanceActual, additionalAngle (TODO: mel bych asi aktualizovat i velocity)
+//   na tomto zaklade aktualizuju i dt
+
 
 public class SolverBasic extends SolverAbstract {
 
@@ -20,10 +24,11 @@ public class SolverBasic extends SolverAbstract {
     public double solve() {
         double alpha = enemy.alphaAI; //nebo enemy.alpha
         double enemyVelocity = enemy.velocityAI ; //nebo enemy.velocity
+       
+        
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
-        
         double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
         double ds = dt*enemyVelocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
 

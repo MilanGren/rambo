@@ -2,6 +2,7 @@
 package rambo.solver;
 
 import java.util.List;
+import static logger.Logger.*;
 import rambo.Enemy;
 import rambo.Utils;
 

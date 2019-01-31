@@ -21,10 +21,6 @@ import static logger.Logger.Rambo.* ;
 //TODO - dodelat silu strely jako funkci polohy - cim dal, tim slabsi strela
 
 public class Rambo extends AdvancedRobot {
-    
-        
-
-    
  
     double normalizeBearing(double angle) {
 	while (angle >  180) angle -= 360;
@@ -103,9 +99,20 @@ public class Rambo extends AdvancedRobot {
         int round = 0 ;
         
         while(true) {
-            
+          
+           
+           log("---------- BOC ") ;
+           if (enemy.time_vec.size() > 0) {
+               log("-- main time " + getTime() + " enemy time " + enemy.time_vec.get(enemy.time_vec.size()-1) + " --") ;
+           } else {
+               log("main time " + getTime()) ;
+           }
             
                 if (enemy.hitTimeBuffer.size() > 0 && enemy.hitTimeBuffer.contains( (int) getTime() ) ) {  //pokud nastal cas.. 
+                    
+                    
+                    log(" last in hitTimeBuffer " + enemy.hitTimeBuffer.get(enemy.hitTimeBuffer.size()-1)) ;
+                    
 
                     //vzdy me zajima stredni rychlost a uhel odjezdu mezi dvema predpokladanymy casy dopadu
 
@@ -119,16 +126,11 @@ public class Rambo extends AdvancedRobot {
 
                 }
 
-            
-            
-            
             ai.xVec.add(getX()) ;
             ai.yVec.add(getY()) ;
             ai.dtime += 1 ; // OPRAVDU FUNGUJE? MELO BY DIKY SETTERUM VSUDE
             
-            log("---------- BOC " + round + " getTime" + getTime()) ;
             doMove(); 
-            log("---------- EOC " + round + " getTime" + getTime() + "\n") ;
             round++ ;
             execute() ;
 
@@ -177,7 +179,7 @@ public class Rambo extends AdvancedRobot {
             double angle = Utils.scalar(enemy.direction(),radar_direction) ;
             logRadar(".... angle to enemy " + angle) ;
             logRadar(".... direction to enemy " + dire) ;
-            setTurnRadarRight(angle) ;
+            setTurnRadarRight(angle*1.5) ;
         }
         
         if (tooCloseToWall) {    
@@ -207,7 +209,7 @@ public class Rambo extends AdvancedRobot {
   
     public void setFireMode(ScannedRobotEvent e) {
         
-        log("setWhenClose BEGIN") ;
+
         double distance = e.getDistance() ;
   
         double e_bearing = getAngleInvariant(e.getBearing()) ;
@@ -232,7 +234,7 @@ public class Rambo extends AdvancedRobot {
         } else {
         //    logFire("can not fire ........ gunHeat > 0 " + getGunHeat()) ;
         }
-        log("setWhenClose END") ;
+
     }
     
 
@@ -246,7 +248,6 @@ public class Rambo extends AdvancedRobot {
         double dy = distance*Math.cos(absAngle) ;
         
         enemy.set(getX() + dx,getY() + dy,dx,dy,absAngle,e.getEnergy(),e.getHeading(),getTime()) ;
-        
         enemyWasFoundFirstTime = true ;
 
         double e_bearing = getAngleInvariant(e.getBearing()) ;
