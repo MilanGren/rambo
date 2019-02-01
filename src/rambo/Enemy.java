@@ -54,7 +54,6 @@ public class Enemy {
     public List<Double> accelVec = new ArrayList<>() ;
     public List<Integer> accelDirVec = new ArrayList<>() ;
     
-    
     public Map<Integer, Double> alphaMap = new HashMap<>() ;
     
     public List<Integer> hitTimeBuffer = new ArrayList<>() ;
