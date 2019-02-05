@@ -30,23 +30,25 @@ public class AI {
     public double dtime = 0 ;
     
     public boolean allowFire = true ;
+    
+    private double bulletSpeed, firePower ;
+    
 
-    boolean useLog = true ;
     
-    public double bulletSpeed ;
-    
-    public AI(boolean useLog) {
-        this.useLog = useLog ;
+    public double getBulletSpeed() {
+        return bulletSpeed ;
     }
     
-    
+    public double getFirePower() {
+        return firePower ;
+    }
     
     public <T> void logAI(T t) {
         //System.out.println("Rambo AI " + t) ;
     }
     
     
-    public double getFirepower(double distance)  {
+    public void setFirePower(double distance)  {
         
         double x[] = {100,FIRSTRINGRADIUS,SECONDRINGRADIUS,2000} ;
         //double y[] = {Rules.MAX_BULLET_POWER,Rules.MAX_BULLET_POWER/2,1.0} ;
@@ -54,15 +56,18 @@ public class AI {
         
         Interpolator l = new Interpolator(x,y) ;
         
-        double firepower = l.interpolate(distance) ;
+        double firePower = l.interpolate(distance) ;
         
-        bulletSpeed = 20 - 3*firepower ;
+        bulletSpeed = 20 - 3*firePower ;
         
-        logAI("distance = " + distance + " => firepower " + firepower + " => bullet speed " + bulletSpeed) ;
+        logAI("distance = " + distance + " => firepower " + firePower + " => bullet speed " + bulletSpeed) ;
     
-        return firepower ;
+        
         
     }
+    
+    
+    
  
     public double getTotalDistance() {
         double tot = 0;

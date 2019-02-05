@@ -213,7 +213,13 @@ logAIinfo("--") ;
                 int hitTime_prev   = hitTimeBufferReduced.get(i-1) ;
             
 logAIinfo("  hitTime_actual " + hitTime_ptr ) ;
-logAIinfo("  time_vec " + time_vec) ;
+
+// mezi index actual a prev je vzdy vyhodnocena poloha, na kterou se dostal enemy za predikovany cas
+// je spoctena alphaAI a stredni rychlost velocityAI - rychlost, aby se dostal o dx a dy za predikovany cas
+// tyto hodnoty se muzou porovnat s pouzitymy odhady alpha a velocity - odhady z jednoho bodu
+
+// problem je predikovany cas: dr/bulletVelocity nemusi byt rovna predikovanemu casu
+
                 index_actual = time_vec.indexOf(hitTime_ptr) ; 
                 index_prev = time_vec.indexOf(hitTime_prev) ; 
 
@@ -245,14 +251,6 @@ logAIinfo(" ") ;
                 ddyMean += ddy ;
                 ddrMean += Utils.sqrtform(ddx,ddy) ; 
                 
-                /*
-                logAIinfo("\n         time_actual" + time_actual) ;
-                logAIinfo("         time_prev" + time_prev) ;
-                logAIinfo("         i want heading for " + time_prev) ;
-                logAIinfo(headingVec.size()) ;
-                logAIinfo(headingVec.get(index_prev)) ;
-                logAIinfo("") ;
-                */
                 double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(index_prev),dy_vec.get(index_prev)*headingVec.get(index_prev)} ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 
@@ -265,8 +263,7 @@ logAIinfo(" ") ;
                 logAIinfo("velocityAI " + round(velocityAI,1) + " velocity " + round(velVec.get(index_prev),1)) ;
                 logAIinfo("di " + (alphaMap.get(time_prev)-alphaAI));
                 logAIinfo("enemy heading " + headingVec.get(index_prev)) ;
-                logAIinfo("enemy heading " + headingVec) ;
-                //alphaFixing = alphaAI - alphaMap.get(time_prev) ;
+
             }
             
             logAIinfo("last alpha used " + round(alpha,1)) ;
@@ -312,11 +309,7 @@ logAIinfo(" ") ;
     
 
     public void fin(double bulletVelocity,int getTime) {
-        
-
         //SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
-        
-        
         SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;

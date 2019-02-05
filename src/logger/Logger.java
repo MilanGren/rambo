@@ -15,7 +15,7 @@ public class Logger {
     public static class Rambo {
         
         public static <T> void logMove(T t) {
-    //    System.out.println("Move " + t) ;
+        //System.out.println("Move " + t) ;
         }
     
         public static <T> void logFire(T t) {
@@ -27,7 +27,7 @@ public class Logger {
         }
     
         public static <T> void log(T t) {
-        //System.out.println(t) ;
+        System.out.println(t) ;
         }
     }
     
