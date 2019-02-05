@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package rambo;
 
 import rambo.exceptions.WrongTimeStatusException;
@@ -14,37 +10,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
-import static logger.Logger.Enemy.* ;
+import static rambo.Logger.Enemy.* ;
 import static rambo.Utils.* ;
 
-/**
- *
- * @author gre
- */
+
 public class Enemy {
     
     public double distance, velocity, velocityAI, angle, enemyHeading, alpha, alphaAI = 0, additionalAngle;
     
     public int timeNow ;
-    
-    
-    
+
     private double dA, dB ;
     
     public double xC, yC, dx, dy, absAngle ; // udelat gettery???
     
     //Map<Double, Double[]> dXYmap = new HashMap<>() ;
     
-    public List<Double> dx_vec = new ArrayList<>() ;
-    public List<Double> dy_vec = new ArrayList<>() ;
-    public List<Double> xC_vec = new ArrayList<>() ;
-    public List<Double> yC_vec = new ArrayList<>() ;
-    public List<Integer> time_vec = new ArrayList<>() ;
+    public List<Double> dxVec = new ArrayList<>() ;
+    public List<Double> dyVec = new ArrayList<>() ;
+    public List<Double> xVec = new ArrayList<>() ;
+    public List<Double> yVec = new ArrayList<>() ;
+    public List<Integer> timeVec = new ArrayList<>() ;
     
     public List<Double> eneVec = new ArrayList<>() ;
     public List<Boolean> wasFired = new ArrayList<>() ;
@@ -58,18 +47,11 @@ public class Enemy {
     
     public List<Integer> hitTimeBuffer = new ArrayList<>() ;
     int predictedHitTime ;
-    
-    
-    /*
-    public void setTime(long time) {
-        timeNow = time ;
-        time_vec.add((int) time) ;  //cas se zapisuje vzdy, kdy nepritele uvidim
-    }
-    */
+
     private int getHeadingVec(double heading) {
 
         double[] hding = {Math.sin(Utils.toRad(heading+2)),Math.cos(Utils.toRad(heading+2))} ; //5 aby to nedavalo Nan - HACK
-        double[] ddr = {(xC_vec.get(xC_vec.size()-1) - xC_vec.get(xC_vec.size()-2)),(yC_vec.get(yC_vec.size()-1) - yC_vec.get(yC_vec.size()-2))} ;
+        double[] ddr = {(xVec.get(xVec.size()-1) - xVec.get(xVec.size()-2)),(yVec.get(yVec.size()-1) - yVec.get(yVec.size()-2))} ;
         
         if (Utils.scalar(hding,ddr) < -90 || Utils.scalar(hding,ddr) > 90) {
             return -1 ;
@@ -79,27 +61,26 @@ public class Enemy {
     }
     
     public void set(double xC, double yC,double dx, double dy, double absAngle,double energy, double heading, long time) {
-        
-        //time_vec jde vzdy s dx_vec a dy_vec
-        
-        //pokud chci najit dx_vec pro dany time, potom musim najit index v time_vec
+
+        //pokud chci najit dx_vec pro dany time point - getTime(), potom musim najit index v time_vec
+        //zapisuje se obecne vzdy, kdy nepritele uvidim
         
         this.xC = xC ;
         this.yC = yC ;
         this.dx = dx ;
         this.dy = dy ;
         this.absAngle = absAngle ;
-        dx_vec.add(dx) ;
-        dy_vec.add(dy) ;
-        xC_vec.add(xC) ;
-        yC_vec.add(yC) ;
+        dxVec.add(dx) ;
+        dyVec.add(dy) ;
+        xVec.add(xC) ;
+        yVec.add(yC) ;
         timeNow = (int) time ;
-        time_vec.add((int) time) ;  //cas se zapisuje vzdy, kdy nepritele uvidim
+        timeVec.add((int) time) ;  
         eneVec.add(energy) ;
 
         
         double dds ;
-        if (time_vec.size() == 1) {
+        if (timeVec.size() == 1) {
             velVec.add(0.0) ;
             //velAveVec.add(0.0) ;
             accelVec.add(0.0) ;
@@ -109,15 +90,12 @@ public class Enemy {
 
         } else {
                 
-            
             headingVec.add( getHeadingVec(heading) ) ;
-            
-            dds = Math.pow( Math.pow(xC_vec.get(xC_vec.size()-1)-xC_vec.get(xC_vec.size()-2),2) + Math.pow(yC_vec.get(yC_vec.size()-1)-yC_vec.get(yC_vec.size()-2),2) , 0.5) ;
-            double dtime = time_vec.get(time_vec.size()-1) - time_vec.get(time_vec.size()-2) ; 
-            
+
+            dds = Math.pow(Math.pow(xVec.get(xVec.size()-1)-xVec.get(xVec.size()-2),2) + Math.pow(yVec.get(yVec.size()-1)-yVec.get(yVec.size()-2),2) , 0.5) ;
+            double dtime = timeVec.get(timeVec.size()-1) - timeVec.get(timeVec.size()-2) ; 
             
             velVec.add(dds/dtime*velocity/Math.abs(velocity)); //zde je HACKem vyresen problem +/- rychlosti
-            
             
             double v0 = velVec.get(velVec.size()-2) ; //musi byt ZA pridanim do velVec
             double vAve = (velVec.get(velVec.size()-1) + velVec.get(velVec.size()-2))/2 ;
@@ -149,11 +127,11 @@ public class Enemy {
             
             logEnemy("AI enemy listing") ;
             int index = 0 ; 
-            for (int t: time_vec) {
+            for (int t: timeVec) {
  
                 logEnemy(" time " + t 
-                         + " dx " + Utils.round(xC_vec.get(index),1) 
-                         + " dy " + Utils.round(yC_vec.get(index),1)
+                         + " dx " + Utils.round(xVec.get(index),1) 
+                         + " dy " + Utils.round(yVec.get(index),1)
                          + " vel " + Utils.round(velVec.get(index),2)
                          //+ " velAve " + Utils.round(velAveVec.get(index),2)
                          + " accel " + Utils.round(accelVec.get(index),2)
@@ -211,8 +189,6 @@ public class Enemy {
 logAIinfo("--") ;
                 int hitTime_ptr = hitTimeBufferReduced.get(i) ;
                 int hitTime_prev   = hitTimeBufferReduced.get(i-1) ;
-            
-logAIinfo("  hitTime_actual " + hitTime_ptr ) ;
 
 // mezi index actual a prev je vzdy vyhodnocena poloha, na kterou se dostal enemy za predikovany cas
 // je spoctena alphaAI a stredni rychlost velocityAI - rychlost, aby se dostal o dx a dy za predikovany cas
@@ -220,38 +196,32 @@ logAIinfo("  hitTime_actual " + hitTime_ptr ) ;
 
 // problem je predikovany cas: dr/bulletVelocity nemusi byt rovna predikovanemu casu
 
-                index_actual = time_vec.indexOf(hitTime_ptr) ; 
-                index_prev = time_vec.indexOf(hitTime_prev) ; 
+                index_actual = timeVec.indexOf(hitTime_ptr) ; 
+                index_prev = timeVec.indexOf(hitTime_prev) ; 
 
-logAIinfo("  time_vec.size() " + time_vec.size())  ;
+logAIinfo("  time_vec.size() " + timeVec.size())  ;
 logAIinfo("  index_actual " + index_actual ) ;
 
-                time_ptr = time_vec.get(index_actual) ;
-                time_prev = time_vec.get(index_prev) ; 
+                time_ptr = timeVec.get(index_actual) ;
+                time_prev = timeVec.get(index_prev) ; 
                 
 logAIinfo(" ") ;  
               
-                
-                dTimeMean += time_ptr - time_prev ;
+
 
                 try {
-                    if (time_vec.get(index_actual) - time_vec.get(index_prev) != hitTime_ptr - hitTime_prev) {
+                    if (timeVec.get(index_actual) - timeVec.get(index_prev) != hitTime_ptr - hitTime_prev) {
                         throw new WrongTimeStatusException("") ;
                     }
                 } catch (WrongTimeStatusException ex) {
-                    Logger.getLogger(Enemy.class.getName()).log(Level.SEVERE, null, ex);
                     System.out.println("System.exit(1)") ;
                     System.exit(1) ;
                 }
                     
-                double ddx = (xC_vec.get(index_actual) - xC_vec.get(index_prev)) ;
-                double ddy = (yC_vec.get(index_actual) - yC_vec.get(index_prev)) ;
+                double ddx = (xVec.get(index_actual) - xVec.get(index_prev)) ;
+                double ddy = (yVec.get(index_actual) - yVec.get(index_prev)) ;
                 
-                ddxMean += ddx ;
-                ddyMean += ddy ;
-                ddrMean += Utils.sqrtform(ddx,ddy) ; 
-                
-                double[] vector_to_position_before_fire = {dx_vec.get(index_prev)*headingVec.get(index_prev),dy_vec.get(index_prev)*headingVec.get(index_prev)} ;
+                double[] vector_to_position_before_fire = {dxVec.get(index_prev)*headingVec.get(index_prev),dyVec.get(index_prev)*headingVec.get(index_prev)} ;
                 double[] vector_change_direction = {ddx,ddy} ;
                 
                 alphaAI = Utils.scalar( vector_to_position_before_fire, vector_change_direction) ;
@@ -268,18 +238,6 @@ logAIinfo(" ") ;
             
             logAIinfo("last alpha used " + round(alpha,1)) ;
             
-            
-            /*
-            ddrMean = ddrMean/(hitTimeBufferReduced.size()-2) ; 
-            ddxMean = ddxMean/(hitTimeBufferReduced.size()-2) ; 
-            ddyMean = ddyMean/(hitTimeBufferReduced.size()-2) ;
-            dTimeMean = dTimeMean/(hitTimeBufferReduced.size()-2) ;
-            */
-            //double[] ddrVec = {ddxMean,ddyMean} ;
-            
-            //logAIinfo("1 ddrMean " + ddrMean + " velocity " + velocityAI + " dTimeMean " + dTimeMean) ;
-            //logAIinfo("2 ddrMean " + Utils.sqrtform(ddxMean,ddyMean) + "\n") ;
-            
         }
     }
 
@@ -293,32 +251,21 @@ logAIinfo(" ") ;
         return this.additionalAngle ;
     }
     
-    double normalizeBearing(double angle) {
-	while (angle >  180) angle -= 360;
-	while (angle < -180) angle += 360;
-	return angle;
-    }
-    
+
     private double timeForBullet(double distance,double bulletVelocity) {
-        double timeForBullet = distance/bulletVelocity ;
-        //log("bullet velocity " + bulletVelocity) ;
-        //log("distance " + distance) ;
-        //log("enemy time for bullet " + timeForBullet) ;
-        return timeForBullet ;
+        return distance/bulletVelocity ;
     }
     
 
     public void fin(double bulletVelocity,int getTime) {
-        //SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
-        SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
+        SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
+        //SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
         solver.solve() ;
-        
         predictedHitTime = (int) solver.solve() + getTime  ; 
-
         this.additionalAngle = solver.additionalAngle ;
                 
     }

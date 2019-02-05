@@ -6,8 +6,8 @@
 package rambo;
 
 import java.util.Random;
-import logger.Logger.*;
-import static logger.Logger.*;
+import rambo.Logger.*;
+import static rambo.Logger.*;
 
 
 public class Utils {

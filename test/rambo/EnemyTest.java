@@ -42,7 +42,7 @@ public class EnemyTest {
     public void testToRad() {
         System.out.println("toRad");
         double x = 120.0;
-        Enemy instance = new Enemy(false);
+        Enemy instance = new Enemy();
         double expResult = 2.0943951024 ;
         double result = Utils.toRad(x);
         assertEquals(expResult, result, 0.0001);
@@ -57,7 +57,7 @@ public class EnemyTest {
     public void testToDeg() {
         System.out.println("toDeg");
         double x = Math.PI/4;
-        Enemy instance = new Enemy(false);
+        Enemy instance = new Enemy();
         double expResult = 45;
         double result = Utils.toDeg(x);
         assertEquals(expResult, result, 0.0001);

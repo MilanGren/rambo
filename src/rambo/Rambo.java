@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static logger.Logger.Rambo.* ;
+import static rambo.Logger.Rambo.* ;
 import static rambo.Utils.normalizeBearing ;
 
 
@@ -85,8 +85,8 @@ public class Rambo extends AdvancedRobot {
         
         while(true) {
             log("---------- BOC ") ;
-            if (enemy.time_vec.size() > 0) {
-                log("-- main time " + getTime() + " enemy time " + enemy.time_vec.get(enemy.time_vec.size()-1) + " --") ;
+            if (enemy.timeVec.size() > 0) {
+                log("-- main time " + getTime() + " enemy time " + enemy.timeVec.get(enemy.timeVec.size()-1) + " --") ;
             } else {
                 log("main time " + getTime()) ;
             }
@@ -149,8 +149,7 @@ public class Rambo extends AdvancedRobot {
             setMaxVelocity(Rules.MAX_VELOCITY*0.7);
             logMove("1: holdSettingToBullet " + setBodyToEnemy) ;
             double moveLeftBy = normalizeBearing(getHeadingInvariant() - wallSurfaceAngle) ;
-            
-            
+      
             logMove("1: moving left " + moveLeftBy ) ;
             setTurnLeft(moveLeftBy) ;
             
@@ -179,8 +178,11 @@ public class Rambo extends AdvancedRobot {
         
         ai.setFirePower(distance) ; // 
         
-        double firepower = ai.getFirePower() ;
+        double firePower = ai.getFirePower() ;
         double bulletSpeed = ai.getBulletSpeed() ; 
+        
+        //double firePower = 1 ;
+        //double bulletSpeed = 20 - 3*firePower ;
         
         enemy.fin(bulletSpeed,(int) getTime()) ; //
       
@@ -192,8 +194,9 @@ public class Rambo extends AdvancedRobot {
         if (getGunHeat() <= 0 && Math.abs( getGunTurnRemaining() ) < 3 && ai.allowFire) {
             double energy = getEnergy() ;
             logFire("fire!") ;
-            logFire(" ai.getFirePower() " + firepower) ;
-            setFire(firepower) ;
+            logFire(" firePower " + firePower + " bulletSpeed " + bulletSpeed) ;
+            
+            setFire(firePower) ;
             //double gh = 1+firepower/5 ;
             enemy.hitTimeBuffer.add( enemy.predictedHitTime ) ; //asi HACK - prasarna
         } else {
@@ -266,7 +269,6 @@ public class Rambo extends AdvancedRobot {
             double fixingdb = 0;
             
             logMove("setting body to enemy") ;
-            
             logMove("  " + distance + " / " + ai.FIRSTRINGRADIUS) ;
             
             if (distance < ai.FIRSTRINGRADIUS && b>= 0) { //chci se oddalit
@@ -287,14 +289,8 @@ public class Rambo extends AdvancedRobot {
             logMove("body by angle: no   fix " + angle) ;
             angle = angle + fixingdb ;
             logMove("body by angle: with fix " + angle) ;
-            
-            //if (Math.abs(angle) < 1) {
-            //    logMove("  angle < " + anglefixed + " so not doing anything") ;
-            //} 
-            //else {
-                //turnLeft(angle) ;
-                setTurnLeft(angle) ;
-            //}
+            setTurnLeft(angle) ;
+
         } else {
             logMove("holding setting perp to bullet: " + setBodyToEnemy) ;
         }
@@ -329,7 +325,7 @@ public class Rambo extends AdvancedRobot {
     
     public void onHitByBullet(HitByBulletEvent e) {     
         ai.hitVec.add((int) getTime()) ;
-        moveDirection *= -1 ;
+        moveDirection *= randomer.getIntBooleanRandom() ;
     }
     
     private double getAngleInvariant(double angle) { 

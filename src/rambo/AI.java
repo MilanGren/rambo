@@ -56,7 +56,7 @@ public class AI {
         
         Interpolator l = new Interpolator(x,y) ;
         
-        double firePower = l.interpolate(distance) ;
+        firePower = l.interpolate(distance) ;
         
         bulletSpeed = 20 - 3*firePower ;
         

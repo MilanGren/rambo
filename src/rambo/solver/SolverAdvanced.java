@@ -2,7 +2,7 @@
 package rambo.solver;
 
 import java.util.List;
-import static logger.Logger.*;
+import static rambo.Logger.*;
 import rambo.Enemy;
 import rambo.Utils;
 
@@ -16,6 +16,8 @@ public class SolverAdvanced extends SolverAbstract {
     
     @Override
     public double solve() {
+        double alpha = enemy.alpha; //nebo enemy.alphaAI
+                
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
         logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
@@ -78,9 +80,9 @@ public class SolverAdvanced extends SolverAbstract {
 // 
 
         //log("  enemy: dt " + dt + " ds " + ds + " alpha deg,rad " + alpha + " , " + toRad(alpha)) ;
-        logSolver("                                                   " + enemy.alpha + ", " + ds + ", " + distanceActual) ;
-        dA = Math.cos(Utils.toRad(enemy.alpha))*ds ; 
-        dB = Math.sin(Utils.toRad(enemy.alpha))*ds ;
+        logSolver("                                                   " + alpha + ", " + ds + ", " + distanceActual) ;
+        dA = Math.cos(Utils.toRad(alpha))*ds ; 
+        dB = Math.sin(Utils.toRad(alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
         double projection = this.distanceOriginal + dA ; 

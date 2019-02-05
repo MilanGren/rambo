@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package logger;
+package rambo;
 
 /**
  *
@@ -19,7 +19,7 @@ public class Logger {
         }
     
         public static <T> void logFire(T t) {
-    //    System.out.println("Fire" + t) ;
+        System.out.println("Fire " + t) ;
         }
     
         public static <T> void logRadar(T t) {
@@ -27,7 +27,7 @@ public class Logger {
         }
     
         public static <T> void log(T t) {
-        System.out.println(t) ;
+        //System.out.println(t) ;
         }
     }
     
@@ -38,7 +38,7 @@ public class Logger {
         }
         
         public static <T> void logAIinfo(T t) {
-            System.out.println("info " + t) ;
+          //  System.out.println("info " + t) ;
         }
 
     }

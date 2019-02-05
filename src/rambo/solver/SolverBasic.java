@@ -3,7 +3,7 @@
 package rambo.solver;
 
 import java.util.List;
-import static logger.Logger.* ;
+import static rambo.Logger.* ;
 import rambo.Enemy;
 import rambo.Utils;
 
@@ -22,8 +22,8 @@ public class SolverBasic extends SolverAbstract {
 
     @Override
     public double solve() {
-        double alpha = enemy.alphaAI; //nebo enemy.alpha
-        double enemyVelocity = enemy.velocityAI ; //nebo enemy.velocity
+        double alpha = enemy.alpha; //nebo enemy.alphaAI
+        double enemyVelocity = enemy.velocity ; //nebo enemy.velocityAI
        
         
         // vzdycky se aktualizuje uhel a tim i vzdalenost
