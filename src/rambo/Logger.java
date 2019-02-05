@@ -15,15 +15,15 @@ public class Logger {
     public static class Rambo {
         
         public static <T> void logMove(T t) {
-        //System.out.println("Move " + t) ;
+        // System.out.println("Move " + t) ;
         }
     
         public static <T> void logFire(T t) {
-        System.out.println("Fire " + t) ;
+        //System.out.println("Fire " + t) ;
         }
     
         public static <T> void logRadar(T t) {
-        //System.out.println("Radar " + t) ;
+        System.out.println("Radar " + t) ;
         }
     
         public static <T> void log(T t) {

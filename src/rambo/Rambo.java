@@ -105,7 +105,7 @@ public class Rambo extends AdvancedRobot {
 
                 //    zajima me finalni ddx, ddy - zbran nepotrebuje vedet, jak se tam dostal.. 
 
-                enemy.statusInfo((int) getTime()) ;
+                //enemy.statusInfo((int) getTime()) ;
 
             }
 
@@ -127,7 +127,7 @@ public class Rambo extends AdvancedRobot {
         if (ai.dtime > randomer.get()) {
             testingRandomAngle = randomer.get() ;
             logMove( "         random " + randomer.get() + "testingAngle " + testingRandomAngle + " moveDirection " + moveDirection + "\n") ;
-            moveDirection *= randomer.getIntBooleanRandom() ;
+            //moveDirection *= randomer.getIntBooleanRandom() ;
             randomer.reset() ;
             ai.dtime = 0 ;
         }
@@ -161,8 +161,8 @@ public class Rambo extends AdvancedRobot {
             }
 
         } else {
-//            setMaxVelocity(Rules.MAX_VELOCITY);
-            setMaxVelocity(0) ;
+            setMaxVelocity(Rules.MAX_VELOCITY);
+//            setMaxVelocity(0) ;
 
         }
         
@@ -224,19 +224,19 @@ public class Rambo extends AdvancedRobot {
         if (distance < ai.FIRSTRINGRADIUS && !firstRingReached) {
             logRadar("onScanned 1: reached " + ai.FIRSTRINGRADIUS) ;
             logRadar("onScanned 1: setting body by " + e_bearing) ;
-            setBodyToEnemy(e_bearing,distance,45) ;
+            setBodyToEnemy(e_bearing,distance,15) ;
             setFireMode(e) ;
             firstRingReached = true ;
         }
         
         else if (distance < ai.SECONDRINGRADIUS && firstRingReached) { // pokracuj v prvnim bode, dokud distance < secondRingRadiu
-            logRadar("onScanned 2a: withing distance " + ai.SECONDRINGRADIUS) ;
+            logRadar("onScanned 2a: withing distance " + ai.SECONDRINGRADIUS + " distance " + distance) ;
             logRadar("onScanned 2a: setting body by " + e_bearing) ;
-            setBodyToEnemy(e_bearing,distance,45) ;
+            setBodyToEnemy(e_bearing,distance,30) ;
             setFireMode(e) ;
             
         } else if (distance < ai.SECONDRINGRADIUS && !firstRingReached) {
-            logRadar("onScanned 2b: withing distance " + ai.SECONDRINGRADIUS + distance) ;
+            logRadar("onScanned 2b: withing distance " + ai.SECONDRINGRADIUS + " distance " + distance) ;
             logRadar("onScanned 2b: setting body by " + e_bearing) ;
             setApproachingEnemy(e_bearing);
             setFireMode(e) ;
@@ -246,7 +246,7 @@ public class Rambo extends AdvancedRobot {
             logRadar("onScanned 3: approaching enemy ... distance = " + distance) ;
             firstRingReached = false ;
             approachingEnemy = true ;
-            setFireMode(e) ;
+            //setFireMode(e) ;
             setApproachingEnemy(e_bearing);
         }
     }

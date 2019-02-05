@@ -20,8 +20,8 @@ import robocode.Rules;
 public class AI {
     
     public static final double WALLMARGIN = 160 ; //150
-    public static final double FIRSTRINGRADIUS = 120 ;
-    public static final double SECONDRINGRADIUS = 150 ;
+    public static final double FIRSTRINGRADIUS = 250 ;
+    public static final double SECONDRINGRADIUS = 400 ;
     
     public List<Double> xVec = new ArrayList<>() ;
     public List<Double> yVec = new ArrayList<>() ;
@@ -29,7 +29,7 @@ public class AI {
     
     public double dtime = 0 ;
     
-    public boolean allowFire = true ;
+    public boolean allowFire = false ;
     
     private double bulletSpeed, firePower ;
     
@@ -50,7 +50,7 @@ public class AI {
     
     public void setFirePower(double distance)  {
         
-        double x[] = {100,FIRSTRINGRADIUS,SECONDRINGRADIUS,2000} ;
+        double x[] = {100,200,SECONDRINGRADIUS,2000} ;
         //double y[] = {Rules.MAX_BULLET_POWER,Rules.MAX_BULLET_POWER/2,1.0} ;
         double y[] = {Rules.MAX_BULLET_POWER,Rules.MAX_BULLET_POWER*2/3,Rules.MAX_BULLET_POWER/2,1} ;
         
