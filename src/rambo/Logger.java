@@ -51,7 +51,7 @@ public class Logger {
 
     
     public static <T> void logSolver(T t) {
-        //System.out.println("Solver " + t) ;
+        System.out.println("Solver " + t) ;
     }
     
     

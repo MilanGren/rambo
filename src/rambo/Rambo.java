@@ -127,7 +127,7 @@ public class Rambo extends AdvancedRobot {
         if (ai.dtime > randomer.get()) {
             testingRandomAngle = randomer.get() ;
             logMove( "         random " + randomer.get() + "testingAngle " + testingRandomAngle + " moveDirection " + moveDirection + "\n") ;
-            //moveDirection *= randomer.getIntBooleanRandom() ;
+            moveDirection *= randomer.getIntBooleanRandom() ;
             randomer.reset() ;
             ai.dtime = 0 ;
         }

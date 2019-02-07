@@ -260,11 +260,11 @@ logAIinfo(" ") ;
     public void fin(double bulletVelocity,int getTime) {
         SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
         //SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
-        solver.solve() ;
-        solver.solve() ;
-        solver.solve() ;
-        solver.solve() ;
-        solver.solve() ;
+        
+        while (solver.epsilon > 1) {
+            solver.solve() ;
+        }
+        
         predictedHitTime = (int) solver.solve() + getTime  ; 
         this.additionalAngle = solver.additionalAngle ;
                 

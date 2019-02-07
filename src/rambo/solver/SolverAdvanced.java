@@ -20,9 +20,9 @@ public class SolverAdvanced extends SolverAbstract {
                 
         distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
         
-        logSolver("\nNEW-- " + this.i + " -- distance " + this.distanceActual) ;
-        double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
-        double dsOld = dt*enemy.velocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
+        logSolver("\nNEW-- " + i + " -- distance " + distanceActual) ;
+        double dt = timeForBullet(distanceActual,bulletVelocity) ;
+        double dsOld = dt*enemy.velocity ;//velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
       
         
         double v0 = enemy.velVec.get(enemy.velVec.size()-1) ; //zde je rozdil oprovi v0 v Enemy - zde predikuji
@@ -85,16 +85,19 @@ public class SolverAdvanced extends SolverAbstract {
         dB = Math.sin(Utils.toRad(alpha))*ds ;
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
-        double projection = this.distanceOriginal + dA ; 
+        double projection = distanceOriginal + dA ; 
         
-        this.additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
+        
+
+        epsilon = Math.abs(additionalAnglePrev - additionalAngle) ;
+        additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
         
         
         logSolver("  dB " + dB + "  projection " + (projection)) ;
         logSolver("  dB/projection " + (dB/projection)) ;
         //log("fixing additional angle " + (dB/predicted)) ;
-        logSolver("  fixing additional angle " + this.additionalAngle) ; 
-        this.i++ ;
+        logSolver("  fixing additional angle " + additionalAngle) ; 
+        i++ ;
         logSolver("\n") ;
         return dt ;
     }

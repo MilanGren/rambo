@@ -21,7 +21,7 @@ public class AI {
     
     public static final double WALLMARGIN = 160 ; //150
     public static final double FIRSTRINGRADIUS = 250 ;
-    public static final double SECONDRINGRADIUS = 400 ;
+    public static final double SECONDRINGRADIUS = 500 ;
     
     public List<Double> xVec = new ArrayList<>() ;
     public List<Double> yVec = new ArrayList<>() ;
@@ -29,7 +29,7 @@ public class AI {
     
     public double dtime = 0 ;
     
-    public boolean allowFire = false ;
+    public boolean allowFire = true ;
     
     private double bulletSpeed, firePower ;
     

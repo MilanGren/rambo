@@ -17,9 +17,8 @@ public abstract class SolverAbstract {
  
     
     
-    public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle ;
+    public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle, additionalAnglePrev = 0, epsilon ;
 
-    
     Enemy enemy ;
     
     int i = 0 ;
