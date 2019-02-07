@@ -28,8 +28,10 @@ public class SolverBasic extends SolverAbstract {
         
         // vzdycky se aktualizuje uhel a tim i vzdalenost
         
-        distanceActual = Math.pow(Math.pow(this.distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
-        double dt = timeForBullet(this.distanceActual,this.bulletVelocity) ;
+        distanceActual = Math.pow(Math.pow(distanceOriginal + dA,2) + Math.pow(dB,2),0.5) ;
+        
+        logSolver("\nNEW-- " + i + " -- distance " + distanceActual) ;
+        double dt = timeForBullet(distanceActual,bulletVelocity) ;
         double ds = dt*enemyVelocity ;//this.velVec.get(velVec.size()-1) ; //kolik nepritel ujede za cas dt
 
         logSolver("                                                   " + enemy.alpha + ", " + ds + ", " + distanceActual) ;
@@ -38,16 +40,19 @@ public class SolverBasic extends SolverAbstract {
         logSolver("  => dA " + dA) ;
         logSolver("  => dB " + dB) ;
 
-        double projection = this.distanceOriginal + dA ; 
+        double projection = distanceOriginal + dA ; 
         
-        this.additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
+
+        additionalAnglePrev = additionalAngle ;
+        additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
+        epsilon = Math.abs(additionalAnglePrev - additionalAngle) ;
         
     
         logSolver("  dB " + dB + "  projection " + (projection)) ;
         logSolver("  dB/projection " + (dB/projection)) ;
         //log("fixing additional angle " + (dB/predicted)) ;
-        logSolver("  fixing additional angle " + this.additionalAngle) ; 
-        this.i++ ;
+        logSolver("  fixing additional angle " + additionalAngle) ; 
+        i++ ;
         logSolver("\n") ;
         
         return dt ;

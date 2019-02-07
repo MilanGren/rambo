@@ -89,8 +89,10 @@ public class SolverAdvanced extends SolverAbstract {
         
         
 
-        epsilon = Math.abs(additionalAnglePrev - additionalAngle) ;
+        
+        additionalAnglePrev = additionalAngle ;
         additionalAngle = Utils.toDeg(-Math.atan(dB/projection)) ;
+        epsilon = Math.abs(additionalAnglePrev - additionalAngle) ;
         
         
         logSolver("  dB " + dB + "  projection " + (projection)) ;

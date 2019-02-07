@@ -23,7 +23,7 @@ public class Rambo extends AdvancedRobot {
     
     boolean firstRingReached = false, enemyWasFoundFirstTime = false ;
     
-    int moveDirection = -1 ;
+    int moveDirection = 1 ;
     
     boolean tooCloseToWall = false, setBodyToEnemy = true, approachingEnemy = true ;
     

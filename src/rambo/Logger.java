@@ -23,7 +23,7 @@ public class Logger {
         }
     
         public static <T> void logRadar(T t) {
-        System.out.println("Radar " + t) ;
+        //System.out.println("Radar " + t) ;
         }
     
         public static <T> void log(T t) {

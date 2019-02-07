@@ -38,7 +38,7 @@ public class Utils {
         }
         
         public int getIntBooleanRandom() {
-            double x = doRandom(-1, 1) ;
+            double x = doRandom(-0.6, 1) ;
             return x <= 0 ? -1 : 1 ;
         }
         

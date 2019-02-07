@@ -14,10 +14,8 @@ import rambo.Enemy;
  */
 public abstract class SolverAbstract {
     
- 
-    
-    
-    public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle, additionalAnglePrev = 0, epsilon ;
+
+    public double distanceOriginal, distanceActual, dA, dB, bulletVelocity, additionalAngle, additionalAnglePrev = 0, epsilon = 15 ;
 
     Enemy enemy ;
     

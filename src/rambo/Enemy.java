@@ -258,11 +258,12 @@ logAIinfo(" ") ;
     
 
     public void fin(double bulletVelocity,int getTime) {
-        SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
-        //SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
+        //SolverAbstract solver = new SolverAdvanced(this, 0, 0, bulletVelocity) ;
+        SolverAbstract solver = new SolverBasic(this, 0, 0, bulletVelocity) ;
         
-        while (solver.epsilon > 1) {
+        while (solver.epsilon > 0.1) {
             solver.solve() ;
+            System.out.println("epsilon" + solver.epsilon) ;
         }
         
         predictedHitTime = (int) solver.solve() + getTime  ; 
